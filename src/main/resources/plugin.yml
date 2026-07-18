@@ -8,7 +8,168 @@ load: STARTUP
 authors: [ Hauchdev ]
 website: https://github.com/hauchdev/hChat
 
-softdepend:
-  - Vault
+depend:
   - PlaceholderAPI
   - LuckPerms
+
+softdepend:
+  - Vault
+  - DiscordSRV
+
+permissions:
+  hchat.*:
+    description: Give access to all nonchat commands
+    default: op
+    children:
+      - hchat.message
+      - hchat.reply
+      - hchat.broadcast
+      - hchat.server
+      - hchat.reload
+      - hchat.help
+      - hchat.clear
+      - hchat.ignore
+      - hchat.sc
+      - hchat.spy
+      - hchat.spy.all
+      - hchat.antiblockedwords
+      - hchat.chatbubbles
+      - hchat.me
+      - hchat.roll
+      - hchat.channel
+      - hchat.bypass.cooldown
+      - hchat.admin.channel.create
+      - hchat.admin.channel.edit
+      - hchat.admin.channel.delete
+      - hchat.admin.channel.default
+      - hchat.color
+      - hchat.ad.bypass
+      - hchat.ad.notify
+  hchat.message:
+    description: Allows /message command
+    default: true
+    hchat.reply:
+      description: Allows /reply command
+      default: true
+    hchat.broadcast:
+      description: Allows /broadcast command
+      default: op
+    hchat.reload:
+      description: Allows /hchat reload command
+      default: op
+    hchat.help:
+      description: Allows /hchat help command
+      default: true
+    hchat.clear:
+      description: Allows /clear command
+      default: op
+    hchat.ignore:
+      description: Allows /ignore command
+      default: true
+    hchat.spy:
+      description: Allows /spy command
+      default: op
+    hchat.antiblockedwords:
+      description: Allows to sent blocked words
+      default: op
+    hchat.chatbubbles:
+      description: Allows to use bubble chat
+      default: true
+    hchat.me:
+      description: Allows to use /me command
+      default: true
+    hchat.roll:
+      description: Allows to use /roll command
+      default: true
+    hchat.channel:
+      description: Allows access to /channel commands
+      default: true
+    hchat.admin.channel.create:
+      description: Allows creating new channels
+      default: op
+    hchat.admin.channel.edit:
+      description: Allows editing existing channels
+      default: op
+    hchat.admin.channel.delete:
+      description: Allows deleting channels
+      default: op
+    hchat.admin.channel.default:
+      description: Allows setting the default channel
+      default: op
+    hchat.bypass.cooldown:
+      description: Bypass chat channel cooldowns
+      default: op
+    hchat.color:
+      description: Allows using colors and text formatting in chat
+      default: op
+    hchat.ad.bypass:
+      description: Bypass anti-ad commands
+      default: op
+    hchat.ad.notify:
+      description: Notify players about advertisements
+      default: op
+    hchat.spam.bypass:
+      description: Bypass anti-spam detection
+      default: op
+    hchat.spam.notify:
+      description: Notify players about spam detection
+      default: op
+    hchat.spy.all:
+      description: Receive all messages from all channels regardless of settings
+      default: op
+
+commands:
+  message:
+    description: Send a message to a player.
+    aliases: [msg, tell, w, m, whisper]
+    usage: /message <player> <message>
+    permission: hchat.message
+    permission-message: You do not have <permission> to use this command!
+  reply:
+    description: Reply to a player.
+    aliases: [r]
+    usage: /reply <message>
+    permission: hchat.reply
+    permission-message: You do not have <permission> to use this command!
+  broadcast:
+    description: Send a message to all players.
+    aliases: [bc, broadcast]
+    usage: /broadcast <message>
+    permission: hchat.broadcast
+    permission-message: You do not have <permission> to use this command!
+  hchat:
+    description: Main plugin command for hchat.
+    usage: /hchat <reload|help>
+    permission: hchat.help
+    permission-message: You do not have <permission> to use this command!
+  clear:
+    description: Clear chat.
+    usage: /clear
+    permission: hchat.clear
+    permission-message: You do not have <permission> to use this command!
+  ignore:
+    description: Ignore a player.
+    usage: /ignore <player>
+    permission: hchat.ignore
+    permission-message: You do not have <permission> to use this command!
+  spy:
+    description: Spy on a player.
+    usage: /spy
+    permission: hchat.spy
+    permission-message: You do not have <permission> to use this command!
+  me:
+    description: The character's actions are first-person.
+    usage: /me <message>
+    permission: hchat.me
+    permission-message: You do not have <permission> to use this command!
+  roll:
+    description: Roll a dice.
+    usage: /roll <max number>
+    permission: hchat.roll
+    permission-message: You do not have <permission> to use this command!
+  channel:
+    description: Manage chat channels.
+    aliases: [ch]
+    usage: /channel <set|list|info|create|edit|delete|default> [args]
+    permission: hchat.channel
+    permission-message: You do not have <permission> to use this command!
