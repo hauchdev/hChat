@@ -38,9 +38,6 @@ permissions:
   hchat.reply:
     description: Allows /reply command
     default: true
-  hchat.broadcast:
-    description: Allows /broadcast command
-    default: op
   hchat.reload:
     description: Allows /hchat reload command
     default: op
@@ -75,12 +72,6 @@ commands:
     aliases: [r]
     usage: /reply <message>
     permission: hchat.reply
-    permission-message: You do not have <permission> to use this command!
-  broadcast:
-    description: Send a message to all players.
-    aliases: [bc, broadcast]
-    usage: /broadcast <message>
-    permission: hchat.broadcast
     permission-message: You do not have <permission> to use this command!
   hchat:
     description: Main plugin command for hchat.
