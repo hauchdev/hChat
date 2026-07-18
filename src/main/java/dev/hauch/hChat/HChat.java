@@ -6,6 +6,7 @@ import dev.hauch.hChat.config.PluginMessages;
 import dev.hauch.hChat.listeners.ChatListener;
 import dev.hauch.hChat.listeners.PlayerJoinListener;
 import dev.hauch.hChat.managers.AutoBroadcastManager;
+import dev.hauch.hChat.managers.DndManager;
 import dev.hauch.hChat.managers.IgnoreManager;
 import dev.hauch.hChat.managers.MessageHistory;
 import dev.hauch.hChat.managers.OfflineMessageStore;
@@ -38,6 +39,7 @@ public final class HChat extends JavaPlugin {
     private PlayerLangStorage playerLangStorage;
     private PlayerLangManager playerLangManager;
     private ChatLogger chatLogger;
+    private DndManager dndManager;
 
     // ─── hooks ───
     private boolean discordSRVEnabled;
@@ -54,6 +56,7 @@ public final class HChat extends JavaPlugin {
     public PlayerLangStorage getPlayerLangStorage() { return playerLangStorage; }
     public PlayerLangManager getPlayerLangManager() { return playerLangManager; }
     public ChatLogger getChatLogger() { return chatLogger; }
+    public DndManager getDndManager() { return dndManager; }
     public boolean isDiscordSRVEnabled() { return discordSRVEnabled; }
 
     @Override
@@ -79,6 +82,7 @@ public final class HChat extends JavaPlugin {
         this.autoBroadcastManager = new AutoBroadcastManager(this);
         this.autoBroadcastManager.reload();
         this.chatLogger.purgeOldLogs();
+        this.dndManager = new DndManager();
 
         // ─── COMMANDS ───
         registerCommands();
