@@ -1,0 +1,14 @@
+name: hChat
+version: '${version}'
+
+main: dev.hauch.hChat.HChat
+api-version: '1.20'
+load: STARTUP
+
+authors: [ Hauchdev ]
+website: https://github.com/hauchdev/hChat
+
+softdepend:
+  - Vault
+  - PlaceholderAPI
+  - LuckPerms
