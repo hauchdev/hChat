@@ -27,7 +27,6 @@ direct-messages:
       text:
         - "&7From &e{sender}"
         - "&eClick to reply"
-        -
   clickable-actions:
     enabled: true
     reply-command: "/msg {sender}"

@@ -1,0 +1,65 @@
+
+# System messages.
+no-permission: "&cYou do not have permission!"
+player-only: "&cOnly players can use this command!"
+player-offline: "&cPlayer is offline!"
+message-filtered: "&cYour message was filtered by a channel filter."
+mentioned: "&#ffffffYou were mentioned in chat by &#84FFB8{player}!"
+player-not-found: "&cPlayer not found."
+command-disabled: "&cThis command is disabled."
+
+# Reload.
+reloading: "&aReloading..."
+reloaded: "&aPlugin reloaded!"
+reload-failed: "&cFailed to reload plugin!"
+
+# Help.
+help: "&ehchat | commands:"
+nreload: "&b/hchat reload&e - reload plugin"
+help-command: "&b/hchat help&e - commands list"
+message-command: "&b/m <player> <message>&e - sent a message to a player"
+ignore-command: "&b/ignore <player>&e - ignore a player"
+spy-command: "&b/spy&e - enable/disable spy mode"
+me-command: "&b/me <message>&e - sent a message from your character"
+reply-command: "&b/reply <message>&e - reply to the last player"
+
+# Clear Chat.
+chat-cleared: "&eChat cleared!"
+
+# Broadcast.
+broadcast: "&eBroadcast: &b{message}"
+
+# Message.
+invalid-usage-message: "&eUse: &b/m <player> <message>"
+send-yourself: "&cYou can't send messages to yourself."
+
+# Reply.
+no-reply-target: "&eYou have no target to reply."
+invalid-usage-reply: "&eUse: &b/reply <message>"
+
+# Ignore.
+ignored-player: "&eYou started ignored the player {player}."
+unignored-player: "&eYou no longer ignore the player {player}."
+ignored-by-target: "&eThis player ignores you and you cant send him a message."
+invalid-usage-ignore: "&eUse: &b/ignore <player>"
+you-are-ignoring-player: "&eYou are ignoring {player}. Unignore them first to send messages."
+cannot-ignore-self: "&eYou cant ignore yourself."
+
+# Spy.
+spy-mode-enabled: "&eSpy mode enabled"
+spy-mode-disabled: "&eSpy mode disabled"
+invalid-usage-spy: "&eUse: &b/spy"
+
+# Link hover text
+link-hover: "Click to open: {url}"
+
+# Placeholders.
+placeholders:
+  # Spy command placeholders.
+  spy: # %hchat_spy_enabled%
+    enabled: "&fSpy Mode: &eEnabled"
+    disabled: "&fSpy Mode: &eDisabled"
+  # Ignore command placeholders.
+  ignored: # %hchat_ignored%
+    true: "&eYou are ignoring players"
+    false: "&eYou are not ignoring anyone"

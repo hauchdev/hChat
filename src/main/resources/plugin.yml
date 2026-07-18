@@ -31,7 +31,6 @@ permissions:
       - hchat.sc
       - hchat.spy
       - hchat.spy.all
-      - hchat.me
   hchat.message:
     description: Allows /message command
     default: true
@@ -53,9 +52,6 @@ permissions:
   hchat.spy:
     description: Allows /spy command
     default: op
-  hchat.me:
-    description: Allows to use /me command
-    default: true
   hchat.spy.all:
     description: Receive all messages from all channels regardless of settings
     default: op
@@ -92,9 +88,4 @@ commands:
     description: Spy on a player.
     usage: /spy
     permission: hchat.spy
-    permission-message: You do not have <permission> to use this command!
-  me:
-    description: The character's actions are first-person.
-    usage: /me <message>
-    permission: hchat.me
     permission-message: You do not have <permission> to use this command!
