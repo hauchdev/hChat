@@ -1,0 +1,44 @@
+lang: en
+
+mentions:
+  sound:
+    enabled: true
+    sound: "entity.experience_orb.pickup"
+    volume: 1.0
+    pitch: 1.0
+
+  colors:
+    enabled: true
+    color: "&#54A3FF"
+
+direct-messages:
+
+  sender:
+    format: "&7[&eYou &7-> &e{receiver}&7] &7{message}"
+    hover-text:
+      enabled: false
+      text:
+        - "&7Sent to &e{receiver}"
+        - "&eClick to reply"
+  receiver:
+    format: "&7[&e{sender} &7-> &eYou&7] &7{message}"
+    hover-text:
+      enabled: true
+      text:
+        - "&7From &e{sender}"
+        - "&eClick to reply"
+        -
+  clickable-actions:
+    enabled: true
+    reply-command: "/msg {sender}"
+
+spy-format: "&e{sender} &7-> &e{target}&7: &7{message}"
+
+hover-text:
+
+  enabled: true
+  # Supports PlaceholderAPI placeholders.
+  format:
+    - "&#54FF7F %player_name%" # Name of player
+    - "&7"
+    - "&eClick to send a private message"
