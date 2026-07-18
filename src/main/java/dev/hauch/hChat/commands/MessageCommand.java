@@ -41,9 +41,32 @@ public class MessageCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
+        String message = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
+
         Player target = Bukkit.getPlayerExact(args[0]);
         if (target == null || !target.isOnline()) {
-            player.sendMessage(MessageFormatter.format(plugin.getMessages().getString("player-not-found")));
+            org.bukkit.OfflinePlayer offline = Bukkit.getOfflinePlayer(args[0]);
+            if (!offline.hasPlayedBefore()) {
+                player.sendMessage(MessageFormatter.format(
+                        plugin.getMessages().getString("player-not-found")));
+                return true;
+            }
+
+            // Player is offline but has played before → save and notify.
+            var placeholders = new HashMap<String, String>();
+            placeholders.put("sender", player.getName());
+            placeholders.put("receiver", offline.getName() != null ? offline.getName() : args[0]);
+            placeholders.put("message", message);
+
+            String rendered = net.kyori.adventure.text.serializer.gson.GsonComponentSerializer.gson()
+                    .serialize(MessageFormatter.format(
+                            plugin.getConfigManager().getMessageReceiverFormat(), placeholders));
+            plugin.getOfflineMessageStore().save(offline.getUniqueId(), rendered);
+
+            placeholders.clear();
+            placeholders.put("target", offline.getName() != null ? offline.getName() : args[0]);
+            player.sendMessage(MessageFormatter.format(
+                    plugin.getMessages().getString("offline-message-saved"), placeholders));
             return true;
         }
 
@@ -65,7 +88,6 @@ public class MessageCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        String message = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
 
         Map<String, String> senderPlaceholders = new HashMap<>();
         senderPlaceholders.put("sender", player.getName());
@@ -108,7 +130,12 @@ public class MessageCommand implements CommandExecutor, TabCompleter {
 
         player.sendMessage(senderMsg);
 
-        plugin.getMessageHistory().setLastSender(target.getUniqueId(), player.getUniqueId());
+        plugin.getMessageHistory().recordReceived(target.getUniqueId(),
+                player.getUniqueId(), message);
+
+        if (!sender.hasPermission("hchat.bypass-log")) {
+            plugin.getChatLogger().logPrivateMessage(player.getName(), target.getName(), message);
+        }
 
         if (!plugin.getSpyManager().getSpies().isEmpty()) {
             Map<String, String> spyPlaceholders = new HashMap<>();

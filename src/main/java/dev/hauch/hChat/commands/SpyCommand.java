@@ -5,10 +5,15 @@ import dev.hauch.hChat.utils.MessageFormatter;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class SpyCommand implements CommandExecutor {
+import java.util.Collections;
+import java.util.List;
+
+public class SpyCommand implements CommandExecutor, TabCompleter {
 
     private final HChat plugin;
 
@@ -39,4 +44,13 @@ public class SpyCommand implements CommandExecutor {
 
         return true;
     }
+
+    @Override
+    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender,
+                                                @NotNull Command command,
+                                                @NotNull String label,
+                                                @NotNull String[] args) {
+        return Collections.emptyList();
+    }
+
 }

@@ -20,14 +20,23 @@ help-command: "&b/hchat help&e - commands list"
 message-command: "&b/m <player> <message>&e - sent a message to a player"
 ignore-command: "&b/ignore <player>&e - ignore a player"
 spy-command: "&b/spy&e - enable/disable spy mode"
-me-command: "&b/me <message>&e - sent a message from your character"
 reply-command: "&b/reply <message>&e - reply to the last player"
+hchat-lang-command: "&b/hchat lang <lang>&e - cambia tu idioma"
+invalid-usage-hchat-lang: "&eUse: &b/hchat lang <lang>"
+lang-set: "&aIdioma cambiado a &e{lang}"
 
 # Clear Chat.
 chat-cleared: "&eChat cleared!"
 
 # Broadcast.
-broadcast: "&eBroadcast: &b{message}"
+invalid-usage-broadcast: "&eUse: &b/bc <message>"
+broadcast-disabled: "&cBroadcast is disabled in config.yml."
+broadcast-no-permission-color: "&cYou don't have permission to use color codes in broadcasts."
+message-broadcasted: "&7Your broadcast was sent."
+
+# Offline messages.
+offline-message-saved: "&7Message saved for &e{target}&7. Will be delivered on next login."
+offline-message-delivered: "&eYou have pending messages."
 
 # Message.
 invalid-usage-message: "&eUse: &b/m <player> <message>"
@@ -53,13 +62,21 @@ invalid-usage-spy: "&eUse: &b/spy"
 # Link hover text
 link-hover: "Click to open: {url}"
 
+# Block Words
+filter-warn-staff: "&c[Filter]&e {player}&7: &f{message}"
+
+
 # Placeholders.
 placeholders:
-  # Spy command placeholders.
-  spy: # %hchat_spy_enabled%
+  spy:
     enabled: "&fSpy Mode: &eEnabled"
     disabled: "&fSpy Mode: &eDisabled"
-  # Ignore command placeholders.
-  ignored: # %hchat_ignored%
+  ignored:
     true: "&eYou are ignoring players"
     false: "&eYou are not ignoring anyone"
+  dnd:
+    enabled: "&fDND: &eEnabled"
+    disabled: "&fDND: &eDisabled"
+  last_seen:
+    recent: "&fReceived &e{minutes}&f minutes ago"
+    none: "&fNo recent messages"

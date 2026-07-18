@@ -15,6 +15,7 @@ import org.bukkit.event.Listener;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,6 +34,27 @@ public class ChatListener implements Listener {
 
         String plainMessage = PlainTextComponentSerializer.plainText()
                 .serialize(event.message());
+
+        dev.hauch.hChat.utils.WordFilter wordFilter =
+                new dev.hauch.hChat.utils.WordFilter(plugin.getConfigManager());
+        if (wordFilter.isEnabled()) {
+            Optional<String> result = wordFilter.filter(plainMessage);
+            if (result.isPresent()) {
+                String r = result.get();
+                if ("__BLOCKED__".equals(r)) {
+                    String msg = plugin.getMessages().getString("message-filtered");
+                    sender.sendMessage(dev.hauch.hChat.utils.MessageFormatter.format(msg));
+                    event.setCancelled(true);
+                    return;
+                } else {
+                    event.message(MessageFormatter.format(r));
+                    plainMessage = r;
+                    if (wordFilter.getAction() == dev.hauch.hChat.utils.WordFilter.Action.WARN) {
+                        notifyStaff(sender, plainMessage);
+                    }
+                }
+            }
+        }
 
         if (plugin.getConfigManager().isHoverTextEnabled()) {
             Component original = event.message();
@@ -106,6 +128,17 @@ public class ChatListener implements Listener {
                 });
             });
             event.message(newMessage);
+        }
+    }
+
+    private void notifyStaff(Player sender, String message) {
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            if (p.hasPermission("hchat.monitor.filter") && !p.equals(sender)) {
+                p.sendMessage(MessageFormatter.format(
+                                plugin.getMessages().getString("filter-warn-staff"))
+                        .replaceText(b -> b.matchLiteral("{player}").replacement(sender.getName()))
+                        .replaceText(b -> b.matchLiteral("{message}").replacement(message)));
+            }
         }
     }
 }

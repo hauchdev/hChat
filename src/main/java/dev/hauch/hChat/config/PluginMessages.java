@@ -12,7 +12,7 @@ public class PluginMessages {
 
     public PluginMessages(HChat plugin) {
         this.plugin = plugin;
-        this.languageManager = new LanguageManager(plugin.getDataFolder());
+        this.languageManager = new LanguageManager(plugin.getDataFolder(), plugin);
         loadLanguage();
     }
 
@@ -37,4 +37,17 @@ public class PluginMessages {
     public Component getComponent(String path, java.util.Map<String, String> placeholders) {
         return MessageFormatter.format(getString(path), placeholders);
     }
+
+    public String getString(String path, java.util.Map<String, String> placeholders) {
+        String raw = getString(path);
+        if (raw == null || raw.isEmpty() || placeholders == null || placeholders.isEmpty()) {
+            return raw;
+        }
+        String result = raw;
+        for (java.util.Map.Entry<String, String> e : placeholders.entrySet()) {
+            result = result.replace("{" + e.getKey() + "}", e.getValue());
+        }
+        return result;
+    }
+
 }

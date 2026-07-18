@@ -1,4 +1,5 @@
 lang: en
+debug: false
 
 mentions:
   sound:
@@ -41,3 +42,37 @@ hover-text:
     - "&#54FF7F %player_name%" # Name of player
     - "&7"
     - "&eClick to send a private message"
+
+broadcast:
+  enabled: true
+  format:
+    - ""
+    - "&#2791F5Broadcast:"
+    - "{message}"
+
+  example1:
+    enabled: true
+    message: "&#F52727This broadcast sent every 10 minutes. Edit in /hChat/config.yml"
+    interval: 600
+    display-in-console: true
+
+offline-messages:
+  max-pending: 10
+  sound:
+    enabled: true
+    sound: "entity.experience_orb.pickup"
+    volume: 1.0
+    pitch: 1.0
+
+logging:
+  private-messages:
+    enabled: true
+    path: logs
+    retention-days: 30
+
+word-filter:
+  enabled: true
+  words:
+    - "blacklist1"
+    - "blacklist2"
+  action: "block"   # block | mask | warn

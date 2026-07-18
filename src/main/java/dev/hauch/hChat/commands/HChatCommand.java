@@ -5,6 +5,7 @@ import dev.hauch.hChat.utils.MessageFormatter;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class HChatCommand implements CommandExecutor {
@@ -48,6 +49,23 @@ public class HChatCommand implements CommandExecutor {
                 sender.sendMessage(MessageFormatter.format(plugin.getMessages().getString("ignore-command")));
                 sender.sendMessage(MessageFormatter.format(plugin.getMessages().getString("spy-command")));
                 sender.sendMessage(MessageFormatter.format(plugin.getMessages().getString("reply-command")));
+            }
+            case "lang" -> {
+                if (!sender.hasPermission("hchat.lang")) {
+                    sender.sendMessage(MessageFormatter.format(
+                            plugin.getMessages().getString("no-permission")));
+                    return true;
+                }
+                if (args.length < 2
+                        || !(sender instanceof Player p)) {
+                    sender.sendMessage(MessageFormatter.format(
+                            plugin.getMessages().getString("invalid-usage-hchat-lang")));
+                    return true;
+                }
+                plugin.getPlayerLangManager().set(p.getUniqueId(), args[1]);
+                p.sendMessage(MessageFormatter.format(
+                                plugin.getMessages().getString("lang-set"))
+                        .replaceText(b -> b.matchLiteral("{lang}").replacement(args[1])));
             }
             default -> {
                 sender.sendMessage(MessageFormatter.format(plugin.getMessages().getString("help")));

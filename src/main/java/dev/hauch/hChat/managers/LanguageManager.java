@@ -1,5 +1,6 @@
 package dev.hauch.hChat.managers;
 
+import dev.hauch.hChat.HChat;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -17,11 +18,13 @@ public class LanguageManager {
     private final File langsFolder;
     private FileConfiguration currentLang;
     private final Map<String, FileConfiguration> loadedLanguages;
+    private final HChat plugin;
 
-    public LanguageManager(File dataFolder) {
+    public LanguageManager(File dataFolder, HChat plugin) {
         this.langsFolder = new File(dataFolder, "lang");
         this.loadedLanguages = new HashMap<>();
         setupLanguages();
+        this.plugin = plugin;
     }
 
     private void setupLanguages() {
@@ -91,5 +94,19 @@ public class LanguageManager {
     public String getMessage(String key) {
         if (currentLang == null) return "Missing message: " + key;
         return currentLang.getString(key, "Missing message: " + key);
+    }
+
+    public String getMessage(String key, java.util.UUID player) {
+        String code = null;
+        if (player != null) {
+            var playerLangs = plugin != null ? plugin.getPlayerLangManager() : null;
+            if (playerLangs != null) {
+                code = playerLangs.get(player).orElse(null);
+            }
+        }
+        FileConfiguration target = code != null ? loadedLanguages.get(code) : null;
+        if (target == null) target = currentLang;
+        if (target == null) return "Missing message: " + key;
+        return target.getString(key, "Missing message: " + key);
     }
 }
