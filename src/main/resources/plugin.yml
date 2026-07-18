@@ -107,14 +107,3 @@ commands:
     usage: /me <message>
     permission: hchat.me
     permission-message: You do not have <permission> to use this command!
-  roll:
-    description: Roll a dice.
-    usage: /roll <max number>
-    permission: hchat.roll
-    permission-message: You do not have <permission> to use this command!
-  channel:
-    description: Manage chat channels.
-    aliases: [ch]
-    usage: /channel <set|list|info|create|edit|delete|default> [args]
-    permission: hchat.channel
-    permission-message: You do not have <permission> to use this command!
