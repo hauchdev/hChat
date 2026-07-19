@@ -56,61 +56,50 @@ public class ChatListener implements Listener {
             }
         }
 
-        if (plugin.getConfigManager().isHoverTextEnabled()) {
-            Component original = event.message();
-            Map<String, String> placeholders = new HashMap<>();
-            placeholders.put("player_name", sender.getName());
+        String format = plugin.getConfigManager().resolveChatFormat(sender);
 
-            Component hover = MessageFormatter.formatHover(
-                    plugin.getConfigManager().getHoverTextFormat(), placeholders);
+        event.renderer((source, sourceDisplayName, message, viewer) -> {
+            String resolved = format
+                    .replace("{prefix}", "%vault_prefix%")
+                    .replace("{suffix}", "%vault_suffix%")
+                    .replace("{player}", source.getName())
+                    .replace("{message}",
+                            PlainTextComponentSerializer.plainText().serialize(message));
+            try {
+                if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+                    resolved = me.clip.placeholderapi.PlaceholderAPI.setPlaceholders(source, resolved);
+                }
+            } catch (Throwable ignored) {}
 
-            event.renderer((source, sourceDisplayName, message, viewer) -> {
-                Component displayWithHover = sourceDisplayName.hoverEvent(
-                        net.kyori.adventure.text.event.HoverEvent.showText(hover));
-                return Component.text("")
-                        .append(displayWithHover)
-                        .append(Component.text(": "))
-                        .append(message);
-            });
-        }
+            return MessageFormatter.format(resolved);
+        });
 
         Matcher matcher = MENTION_PATTERN.matcher(plainMessage);
         boolean foundMention = false;
-
         while (matcher.find()) {
             String mentionedName = matcher.group(1);
             Player mentioned = Bukkit.getPlayerExact(mentionedName);
-
             if (mentioned != null && mentioned.isOnline() && !mentioned.equals(sender)) {
                 foundMention = true;
-
                 if (plugin.getConfigManager().isMentionSoundEnabled()) {
                     try {
                         Sound sound = Sound.valueOf(
                                 plugin.getConfigManager().getMentionSound().toUpperCase());
-                        Bukkit.getScheduler().runTask(plugin, () -> {
-                            mentioned.playSound(
-                                    mentioned.getLocation(),
-                                    sound,
-                                    plugin.getConfigManager().getMentionSoundVolume(),
-                                    plugin.getConfigManager().getMentionSoundPitch()
-                            );
-                        });
-                    } catch (IllegalArgumentException e) {
-                        plugin.getLogger().warning("Invalid mention sound: "
-                                + plugin.getConfigManager().getMentionSound());
-                    }
+                        Bukkit.getScheduler().runTask(plugin, () -> mentioned.playSound(
+                                mentioned.getLocation(), sound,
+                                plugin.getConfigManager().getMentionSoundVolume(),
+                                plugin.getConfigManager().getMentionSoundPitch()));
+                    } catch (IllegalArgumentException e) { /* ignore */ }
                 }
-
                 if (plugin.getConfigManager().isMentionColorsEnabled()) {
-                    Map<String, String> mentionPlaceholders = new HashMap<>();
-                    mentionPlaceholders.put("player", sender.getName());
+                    Map<String, String> ph = new HashMap<>();
+                    ph.put("player", sender.getName());
                     mentioned.sendMessage(MessageFormatter.format(
-                            plugin.getMessages().getString("mentioned"),
-                            mentionPlaceholders));
+                            plugin.getMessages().getString("mentioned"), ph));
                 }
             }
         }
+
 
         if (foundMention && plugin.getConfigManager().isMentionColorsEnabled()) {
             String mentionColor = plugin.getConfigManager().getMentionColor();
@@ -141,4 +130,5 @@ public class ChatListener implements Listener {
             }
         }
     }
+
 }

@@ -1,6 +1,55 @@
 lang: en
 debug: false
 
+chat:
+  default-format: "&7{pprefix}{player}{psuffix}&8: &f{message}"
+
+  hex-colors: true
+
+  formats:
+    # ─── Permission: hchat.chat.format.vip ───
+    vip:
+      permission: hchat.chat.format.vip
+      format: "&6&lVIP &8» &e{prefix}{player}{suffix} &8: &f{message}"
+    # ─── Permission: hchat.chat.format.mvp ───
+    mvp:
+      permission: hchat.chat.format.mvp
+      format: "&b&lMVP &8» &b{prefix}{player}{suffix} &8: &7{message}"
+    # ─── Permission: hchat.chat.format.admin ───
+    admin:
+      permission: hchat.chat.format.admin
+      format: "&c&lADMIN &8» &c{prefix}{player}{suffix} &8: &7{message}"
+
+welcome:
+  # Broadcast message on entry. Supports {player}, and PAPI placeholders.
+  enabled: true
+  message: "&a&lWelcome &e{player} &a&lto the server!"
+  # If true, hides the vanilla message "Player joined the game"
+  hide-vanilla: true
+  # Also show MOTD message to the player (in chat, once)
+  motd-on-join: false
+  motd: "&7News: &fThe server is on &bv1.20.x&f. Use &a/hchat help&f."
+
+  # Sound in welcome (opcional)
+  sound:
+    enabled: true
+    sound: "entity.player.levelup"
+    volume: 0.6
+    pitch: 1.0
+
+  # Welcome player (First time)
+  first-join:
+    enabled: true
+    message: "&6&l★ &e{player} &6just joined for the first time!"
+    hide-vanilla: true
+
+quit:
+  enabled: true
+  message: "&c{player} &7left the server."
+  hide-vanilla: true
+  sound:
+    enabled: false
+
 mentions:
   sound:
     enabled: true

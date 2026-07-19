@@ -5,6 +5,7 @@ import dev.hauch.hChat.config.PluginConfig;
 import dev.hauch.hChat.config.PluginMessages;
 import dev.hauch.hChat.listeners.ChatListener;
 import dev.hauch.hChat.listeners.PlayerJoinListener;
+import dev.hauch.hChat.listeners.PlayerQuitListener;
 import dev.hauch.hChat.managers.AutoBroadcastManager;
 import dev.hauch.hChat.managers.DndManager;
 import dev.hauch.hChat.managers.IgnoreManager;
@@ -90,6 +91,8 @@ public final class HChat extends JavaPlugin {
         // ─── LISTENERS ───
         getServer().getPluginManager().registerEvents(new ChatListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(this), this);
+        getServer().getPluginManager().registerEvents(new PlayerJoinListener(this), this);
+        getServer().getPluginManager().registerEvents(new PlayerQuitListener(this), this);
 
         // ─── HOOKS ───
         this.discordSRVEnabled = Bukkit.getPluginManager().getPlugin("DiscordSRV") != null;

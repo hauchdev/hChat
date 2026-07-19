@@ -239,4 +239,109 @@ public class PluginConfig {
     public String getWordFilterAction() {
         return config.getString("word-filter.action", "block");
     }
+
+    // ─── Chat format by permission ────────────────────────────────
+    public String getDefaultChatFormat() {
+        return config.getString("chat.default-format",
+                "&7{prefix}{player}{suffix}&8: &f{message}");
+    }
+
+    public boolean isChatHexColors() {
+        return config.getBoolean("chat.hex-colors", true);
+    }
+
+    public java.util.Map<String, java.util.Map<String, String>> getChatFormats() {
+        java.util.Map<String, java.util.Map<String, String>> out = new java.util.LinkedHashMap<>();
+        org.bukkit.configuration.ConfigurationSection section =
+                config.getConfigurationSection("chat.formats");
+        if (section == null) return out;
+
+        for (String key : section.getKeys(false)) {
+            org.bukkit.configuration.ConfigurationSection sub = section.getConfigurationSection(key);
+            if (sub == null) continue;
+            java.util.Map<String, String> data = new java.util.HashMap<>();
+            data.put("permission", sub.getString("permission", ""));
+            data.put("format", sub.getString("format", getDefaultChatFormat()));
+            out.put(key, data);
+        }
+        return out;
+    }
+
+    public String resolveChatFormat(org.bukkit.entity.Player player) {
+        for (java.util.Map<String, String> entry : getChatFormats().values()) {
+            String perm = entry.get("permission");
+            if (perm != null && !perm.isEmpty() && player.hasPermission(perm)) {
+                return entry.get("format");
+            }
+        }
+        return getDefaultChatFormat();
+    }
+
+    // ─── Welcome / Quit ───────────────────────────────────────────
+    public boolean isWelcomeEnabled() {
+        return config.getBoolean("welcome.enabled", true);
+    }
+
+    public String getWelcomeMessage() {
+        return config.getString("welcome.message",
+                "&aWelcome {player} to the server!");
+    }
+
+    public boolean isWelcomeHideVanilla() {
+        return config.getBoolean("welcome.hide-vanilla", true);
+    }
+
+    public boolean isWelcomeMotdEnabled() {
+        return config.getBoolean("welcome.motd-on-join", false);
+    }
+
+    public String getWelcomeMotd() {
+        return config.getString("welcome.motd", "");
+    }
+
+    public boolean isWelcomeSoundEnabled() {
+        return config.getBoolean("welcome.sound.enabled", true);
+    }
+
+    public String getWelcomeSound() {
+        return config.getString("welcome.sound.sound", "entity.player.levelup");
+    }
+
+    public float getWelcomeSoundVolume() {
+        return (float) config.getDouble("welcome.sound.volume", 0.6);
+    }
+
+    public float getWelcomeSoundPitch() {
+        return (float) config.getDouble("welcome.sound.pitch", 1.0);
+    }
+
+    public boolean isFirstJoinEnabled() {
+        return config.getBoolean("welcome.first-join.enabled", false);
+    }
+
+    public String getFirstJoinMessage() {
+        return config.getString("welcome.first-join.message",
+                "&e{player} &7joined for the first time!");
+    }
+
+    public boolean isFirstJoinHideVanilla() {
+        return config.getBoolean("welcome.first-join.hide-vanilla", true);
+    }
+
+    // ─── Quit ─────────────────────────────────────────────────────
+    public boolean isQuitEnabled() {
+        return config.getBoolean("quit.enabled", true);
+    }
+
+    public String getQuitMessage() {
+        return config.getString("quit.message", "&7{player} left the server.");
+    }
+
+    public boolean isQuitHideVanilla() {
+        return config.getBoolean("quit.hide-vanilla", true);
+    }
+
+    public boolean isQuitSoundEnabled() {
+        return config.getBoolean("quit.sound.enabled", false);
+    }
 }
