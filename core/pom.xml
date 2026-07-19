@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>dev.hauch</groupId>
+        <artifactId>hchat</artifactId>
+        <version>1.2.0</version>
+    </parent>
+
+    <artifactId>core</artifactId>
+    <name>hChat (Core)</name>
+    <description>Version-independent business logic (commands, listeners, managers, utilities).</description>
+
+    <dependencies>
+
+        <!-- Paper API is provided by the server. Core must never compile
+             against CraftBukkit / NMS code – only against PlatformAdapter. -->
+        <dependency>
+            <groupId>io.papermc.paper</groupId>
+            <artifactId>paper-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- PlaceholderAPI is a soft dependency at runtime, but the
+             expansion class must reference types from its API. -->
+        <dependency>
+            <groupId>me.clip</groupId>
+            <artifactId>placeholderapi</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+
+        <resources>
+
+            <!-- Filter ${version} placeholder inside config.yml, etc. -->
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <excludes>
+                    <exclude>plugin.yml</exclude>
+                </excludes>
+            </resource>
+
+            <!-- plugin.yml never lives in core; it belongs to plugin-dist. -->
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <includes>
+                    <include>config.yml</include>
+                    <include>lang/**</include>
+                </includes>
+            </resource>
+
+        </resources>
+
+    </build>
+
+</project>

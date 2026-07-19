@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>dev.hauch</groupId>
+        <artifactId>hchat</artifactId>
+        <version>1.2.0</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>plugin-dist</artifactId>
+    <name>hChat (Distribution)</name>
+    <description>Final shaded jar - JavaPlugin entry point, plugin.yml, bootstrap wiring.</description>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>dev.hauch</groupId>
+            <artifactId>core</artifactId>
+        </dependency>
+
+        <!--
+            Every per-revision adapter module is wired in so a single
+            shaded jar covers the entire legacy through modern range.
+            Removing a module here = effectively dropping support for
+            that revision at the binary level.
+        -->
+        <dependency>
+            <groupId>dev.hauch</groupId>
+            <artifactId>v1_18_R2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>dev.hauch</groupId>
+            <artifactId>v1_19_R1</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>dev.hauch</groupId>
+            <artifactId>v1_19_R2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>dev.hauch</groupId>
+            <artifactId>v1_19_R3</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>dev.hauch</groupId>
+            <artifactId>v1_20_R1</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>dev.hauch</groupId>
+            <artifactId>v1_20_R2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>dev.hauch</groupId>
+            <artifactId>v1_20_R3</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>dev.hauch</groupId>
+            <artifactId>v1_20_R4</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>dev.hauch</groupId>
+            <artifactId>v1_21_R1</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>dev.hauch</groupId>
+            <artifactId>v1_21_R2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>dev.hauch</groupId>
+            <artifactId>v1_21_R3</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.papermc.paper</groupId>
+            <artifactId>paper-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+
+        <finalName>${plugin.name}-${plugin.version}</finalName>
+
+        <resources>
+
+            <!-- plugin.yml lives ONLY in plugin-dist and is filtered
+                 so ${version} matches the project version. -->
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+
+        </resources>
+
+        <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+
+            <!-- Produce the final shaded jar that the user drops on
+                 their server. The shade includes every dev.hauch:v*
+                 module so a class missing on disk causes a hard
+                 compile error upstream, not a runtime surprise. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>${shade.shade.plugin.version}</version>
+
+                <executions>
+
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <minimizeJar>false</minimizeJar>
+                            <shadedArtifactAttached>false</shadedArtifactAttached>
+                            <shadedClassifierName></shadedClassifierName>
+
+                            <artifactSet>
+                                <includes>
+                                    <include>dev.hauch:core</include>
+                                    <include>dev.hauch:v1_18_R2</include>
+                                    <include>dev.hauch:v1_19_R1</include>
+                                    <include>dev.hauch:v1_19_R2</include>
+                                    <include>dev.hauch:v1_19_R3</include>
+                                    <include>dev.hauch:v1_20_R1</include>
+                                    <include>dev.hauch:v1_20_R2</include>
+                                    <include>dev.hauch:v1_20_R3</include>
+                                    <include>dev.hauch:v1_20_R4</include>
+                                    <include>dev.hauch:v1_21_R1</include>
+                                    <include>dev.hauch:v1_21_R2</include>
+                                    <include>dev.hauch:v1_21_R3</include>
+                                </includes>
+                            </artifactSet>
+
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                        <exclude>module-info.class</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+
+                            <transformers>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>dev.hauch.hchat.HChat</mainClass>
+                                </transformer>
+                            </transformers>
+
+                        </configuration>
+                    </execution>
+
+                </executions>
+
+            </plugin>
+
+        </plugins>
+
+    </build>
+
+</project>

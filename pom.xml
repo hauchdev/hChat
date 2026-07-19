@@ -1,79 +1,179 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="https://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>dev.hauch</groupId>
     <artifactId>hchat</artifactId>
-    <version>1.1.2</version>
-    <packaging>jar</packaging>
+    <version>1.2.0</version>
 
-    <name>hchat</name>
+    <packaging>pom</packaging>
+    <name>hChat (Parent)</name>
+    <description>Modern Paper chat plugin, multi-module architecture.</description>
+    <url>https://github.com/hauchdev/hChat</url>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://opensource.org/licenses/MIT</url>
+        </license>
+    </licenses>
+
+    <!--
+        One Maven module per CraftBukkit revision we ship a
+        PlatformAdapter for, plus the always-present core and
+        plugin-dist modules.  Future major Minecraft versions (e.g.
+        a hypothetical 26.x) are NOT listed here on purpose -
+        VersionLoader's MODERN_ALIAS falls back to v1_21_R3 for any
+        unrecognised mapping, so adding the literal module is the
+        right time-to-add decision, not a compile-time concern.
+    -->
+    <modules>
+        <module>core</module>
+
+        <!-- Legacy chain: 1.18.2 - 1.20.4 -->
+        <module>v1_18_R2</module>
+        <module>v1_19_R1</module>
+        <module>v1_19_R2</module>
+        <module>v1_19_R3</module>
+        <module>v1_20_R1</module>
+        <module>v1_20_R2</module>
+        <module>v1_20_R3</module>
+
+        <!-- Modern chain: 1.20.5+ -->
+        <module>v1_20_R4</module>
+        <module>v1_21_R1</module>
+        <module>v1_21_R2</module>
+        <module>v1_21_R3</module>
+
+        <module>plugin-dist</module>
+    </modules>
 
     <properties>
-        <java.version>17</java.version>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <!-- API versions -->
+        <paper.version>1.21.8-R0.1-SNAPSHOT</paper.version>
+        <placeholderapi.version>2.11.6</placeholderapi.version>
+
+        <!-- Plugin build values -->
+        <plugin.name>hChat</plugin.name>
+        <plugin.version>${project.version}</plugin.version>
+        <plugin.author>Hauchdev</plugin.author>
+
+        <!-- Shade plugin -->
+        <shade.prefix>dev.hauch.hchat.lib</shade.prefix>
+        <shade.maven.compiler.version>3.13.0</shade.maven.compiler.version>
+        <shade.shade.plugin.version>3.5.3</shade.shade.plugin.version>
     </properties>
 
-    <build>
-        <defaultGoal>clean package</defaultGoal>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.13.0</version>
-                <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.5.3</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
-    </build>
+    <dependencyManagement>
+        <dependencies>
+
+            <!-- Internal modules. version omitted - inherited from
+                 reactor ${project.version}, helping plugin-dist's
+                 shade plugin identify the artifacts to bundle. -->
+            <dependency>
+                <groupId>dev.hauch</groupId>
+                <artifactId>core</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>dev.hauch</groupId>
+                <artifactId>v1_18_R2</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>dev.hauch</groupId>
+                <artifactId>v1_19_R1</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>dev.hauch</groupId>
+                <artifactId>v1_19_R2</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>dev.hauch</groupId>
+                <artifactId>v1_19_R3</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>dev.hauch</groupId>
+                <artifactId>v1_20_R1</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>dev.hauch</groupId>
+                <artifactId>v1_20_R2</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>dev.hauch</groupId>
+                <artifactId>v1_20_R3</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>dev.hauch</groupId>
+                <artifactId>v1_20_R4</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>dev.hauch</groupId>
+                <artifactId>v1_21_R1</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>dev.hauch</groupId>
+                <artifactId>v1_21_R2</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>dev.hauch</groupId>
+                <artifactId>v1_21_R3</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>dev.hauch</groupId>
+                <artifactId>plugin-dist</artifactId>
+            </dependency>
+
+            <!-- External APIs -->
+            <dependency>
+                <groupId>io.papermc.paper</groupId>
+                <artifactId>paper-api</artifactId>
+                <version>${paper.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>me.clip</groupId>
+                <artifactId>placeholderapi</artifactId>
+                <version>${placeholderapi.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
 
     <repositories>
         <repository>
-            <id>papermc-repo</id>
+            <id>papermc</id>
             <url>https://repo.papermc.io/repository/maven-public/</url>
         </repository>
         <repository>
             <id>placeholderapi</id>
             <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
         </repository>
-
     </repositories>
 
-    <dependencies>
-        <dependency>
-            <groupId>io.papermc.paper</groupId>
-            <artifactId>paper-api</artifactId>
-            <version>1.20-R0.1-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>me.clip</groupId>
-            <artifactId>placeholderapi</artifactId>
-            <version>2.11.6</version>
-            <scope>provided</scope>
-        </dependency>
-    </dependencies>
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${shade.maven.compiler.version}</version>
+                    <configuration>
+                        <release>21</release>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
 </project>
