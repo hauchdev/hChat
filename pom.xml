@@ -7,7 +7,7 @@
 
     <groupId>dev.hauch</groupId>
     <artifactId>hchat</artifactId>
-    <version>1.2.0</version>
+    <version>1.2.3</version>
 
     <packaging>pom</packaging>
     <name>hChat (Parent)</name>
