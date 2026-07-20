@@ -21,7 +21,9 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '21'
+          # Pinned to a specific LTS patch: avoids dynamic Adoptium API
+          # resolution that intermittently fails on ubuntu-latest runners.
+          java-version: '21.0.5'
           cache: 'maven'
 
       - name: Compile all modules and produce shaded jar
