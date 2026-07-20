@@ -6,7 +6,6 @@ import dev.hauch.hchat.api.platform.SoundData;
 import dev.hauch.hchat.api.platform.SoundLookup;
 import dev.hauch.hchat.api.platform.TitleData;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.bungee.BungeeComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -22,10 +21,14 @@ import java.util.Set;
 // class PlatformAdapter_v1_19_R3
 public final class PlatformAdapter_v1_19_R3 implements PlatformAdapter {
 
-    private static final BungeeComponentSerializer BUNGEE =
-            BungeeComponentSerializer.get();
     private static final LegacyComponentSerializer LEGACY_AMP =
             LegacyComponentSerializer.legacyAmpersand();
+    private static final LegacyComponentSerializer LEGACY_SECTION =
+            LegacyComponentSerializer.builder()
+                    .character('§')
+                    .hexColors()
+                    .useUnusualXRepeatedCharacterHexFormat()
+                    .build();
 
     @Override
     // get id
@@ -38,9 +41,7 @@ public final class PlatformAdapter_v1_19_R3 implements PlatformAdapter {
     @Override
     // send action bar
     public void sendActionBar(Player player, Component message) {
-        player.spigot().sendMessage(
-                net.md_5.bungee.api.ChatMessageType.ACTION_BAR,
-                BUNGEE.serialize(message));
+        player.sendActionBar(message);
     }
 
     @Override
@@ -66,7 +67,7 @@ public final class PlatformAdapter_v1_19_R3 implements PlatformAdapter {
     // make boss bar
     public HChatBossBar createBossBar(Component title, BarColor color, BarStyle style) {
         BossBar raw = Bukkit.createBossBar(
-                BUNGEE.serialize(title), color, style);
+                LEGACY_SECTION.serialize(title), color, style);
         return new BukkitHChatBossBar(raw);
     }
 
@@ -95,7 +96,7 @@ public final class PlatformAdapter_v1_19_R3 implements PlatformAdapter {
     @Override
     // send message
     public void sendMessage(CommandSender sender, Component message) {
-        sender.sendMessage(BUNGEE.serialize(message));
+        sender.sendMessage(message);
     }
 
     @Override
@@ -120,7 +121,7 @@ public final class PlatformAdapter_v1_19_R3 implements PlatformAdapter {
 
         @Override
         // set title
-        public void setTitle(Component title) { delegate.setTitle(LegacyComponentSerializer.section().serialize(title)); }
+        public void setTitle(Component title) { delegate.setTitle(LEGACY_SECTION.serialize(title)); }
 
         @Override
         // set color

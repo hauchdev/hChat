@@ -6,6 +6,7 @@ import dev.hauch.hchat.api.platform.SoundData;
 import dev.hauch.hchat.api.platform.SoundLookup;
 import dev.hauch.hchat.api.platform.TitleData;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -22,7 +23,13 @@ import java.util.Set;
 // class PlatformAdapter_v1_21_R1
 public final class PlatformAdapter_v1_21_R1 implements PlatformAdapter {
 
-    private static final int TICKS_PER_SECOND = 20;
+    private static final int TICKS_TO_MS = 50;
+    private static final LegacyComponentSerializer LEGACY_SECTION =
+            LegacyComponentSerializer.builder()
+                    .character('§')
+                    .hexColors()
+                    .useUnusualXRepeatedCharacterHexFormat()
+                    .build();
 
     @Override
     // get id
@@ -55,9 +62,9 @@ public final class PlatformAdapter_v1_21_R1 implements PlatformAdapter {
                 data.title(),
                 data.subtitle(),
                 Title.Times.times(
-                        Duration.ofMillis((long) data.fadeIn() * 50L),
-                        Duration.ofMillis((long) data.stay() * 50L),
-                        Duration.ofMillis((long) data.fadeOut() * 50L)));
+                        Duration.ofMillis((long) data.fadeIn() * TICKS_TO_MS),
+                        Duration.ofMillis((long) data.stay() * TICKS_TO_MS),
+                        Duration.ofMillis((long) data.fadeOut() * TICKS_TO_MS)));
         player.showTitle(title);
     }
 
@@ -70,7 +77,7 @@ public final class PlatformAdapter_v1_21_R1 implements PlatformAdapter {
     @Override
     // make boss bar
     public HChatBossBar createBossBar(Component title, BarColor color, BarStyle style) {
-        BossBar raw = Bukkit.createBossBar(title, color, style);
+        BossBar raw = Bukkit.createBossBar(LEGACY_SECTION.serialize(title), color, style);
         return new BukkitHChatBossBar(raw);
     }
 
@@ -135,7 +142,7 @@ public final class PlatformAdapter_v1_21_R1 implements PlatformAdapter {
         @Override
         // set title
         public void setTitle(Component title) {
-            delegate.setTitle(title);
+            delegate.setTitle(LEGACY_SECTION.serialize(title));
         }
 
         @Override

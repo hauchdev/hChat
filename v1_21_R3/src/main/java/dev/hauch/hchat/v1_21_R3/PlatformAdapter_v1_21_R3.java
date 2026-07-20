@@ -6,6 +6,7 @@ import dev.hauch.hchat.api.platform.SoundData;
 import dev.hauch.hchat.api.platform.SoundLookup;
 import dev.hauch.hchat.api.platform.TitleData;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -23,6 +24,12 @@ import java.util.Set;
 public final class PlatformAdapter_v1_21_R3 implements PlatformAdapter {
 
     private static final int TICKS_TO_MS = 50;
+    private static final LegacyComponentSerializer LEGACY_SECTION =
+            LegacyComponentSerializer.builder()
+                    .character('§')
+                    .hexColors()
+                    .useUnusualXRepeatedCharacterHexFormat()
+                    .build();
 
     @Override
     // get id
@@ -64,7 +71,7 @@ public final class PlatformAdapter_v1_21_R3 implements PlatformAdapter {
     @Override
     // make boss bar
     public HChatBossBar createBossBar(Component title, BarColor color, BarStyle style) {
-        BossBar raw = Bukkit.createBossBar(title, color, style);
+        BossBar raw = Bukkit.createBossBar(LEGACY_SECTION.serialize(title), color, style);
         return new BukkitHChatBossBar(raw);
     }
 
@@ -114,7 +121,7 @@ public final class PlatformAdapter_v1_21_R3 implements PlatformAdapter {
 
         @Override
         // set title
-        public void setTitle(Component title) { delegate.setTitle(title); }
+        public void setTitle(Component title) { delegate.setTitle(LEGACY_SECTION.serialize(title)); }
 
         @Override
         // set color
