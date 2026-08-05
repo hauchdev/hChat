@@ -33,6 +33,7 @@ import dev.hauch.hchat.registry.ManagerRegistry;
 import dev.hauch.hchat.registry.ServiceRegistry;
 import dev.hauch.hchat.service.BroadcastService;
 import dev.hauch.hchat.service.ConfigurationService;
+import dev.hauch.hchat.service.DynamicPlaceholderResolver;
 import dev.hauch.hchat.storage.IgnoreStorage;
 import dev.hauch.hchat.storage.PlayerChannelStorage;
 import dev.hauch.hchat.storage.PlayerLangStorage;
@@ -167,10 +168,14 @@ public final class Bootstrap {
         ServiceRegistry serviceRegistry = new ServiceRegistry();
         ManagerRegistry managerRegistry = new ManagerRegistry();
 
+        DynamicPlaceholderResolver placeholderResolver =
+                new DynamicPlaceholderResolver(config);
+
         serviceRegistry.registerConfigurationService(configurationService);
         serviceRegistry.registerBroadcastService(broadcastService);
         serviceRegistry.registerAutoBroadcastManager(autoBroadcastManager);
         serviceRegistry.registerChatLogger(chatLogger);
+        serviceRegistry.registerPlaceholderResolver(placeholderResolver);
 
         managerRegistry.registerChannelManager(channelManager);
         managerRegistry.registerIgnoreManager(ignoreManager);
@@ -296,7 +301,7 @@ public final class Bootstrap {
 
         ctx.listenerRegistry.register("chat",
                 new ChatListener(plugin, ctx.config, ctx.messages, wordFilter,
-                        ctx.channelManager));
+                        ctx.channelManager, ctx.serviceRegistry.placeholderResolver()));
         ctx.listenerRegistry.register("join",
                 new PlayerJoinListener(plugin, ctx.config, ctx.messages,
                         ctx.offlineMessageStore, ctx.updateChecker));

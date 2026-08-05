@@ -2,6 +2,7 @@ package dev.hauch.hchat.registry;
 
 import dev.hauch.hchat.service.BroadcastService;
 import dev.hauch.hchat.service.ConfigurationService;
+import dev.hauch.hchat.service.DynamicPlaceholderResolver;
 import dev.hauch.hchat.utils.ChatLogger;
 import dev.hauch.hchat.manager.AutoBroadcastManager;
 
@@ -14,6 +15,7 @@ public final class ServiceRegistry extends Registry<Object> {
     public static final String BROADCAST = "broadcast";
     public static final String AUTO_BROADCAST = "auto-broadcast";
     public static final String CHAT_LOGGER = "chat-logger";
+    public static final String PLACEHOLDER_RESOLVER = "placeholder-resolver";
 
     // make ServiceRegistry
     public ServiceRegistry() {
@@ -58,6 +60,16 @@ public final class ServiceRegistry extends Registry<Object> {
     // chat logger
     public ChatLogger chatLogger() {
         return typed(CHAT_LOGGER, ChatLogger.class);
+    }
+
+    // add placeholder resolver
+    public void registerPlaceholderResolver(DynamicPlaceholderResolver resolver) {
+        register(PLACEHOLDER_RESOLVER, resolver);
+    }
+
+    // placeholder resolver
+    public DynamicPlaceholderResolver placeholderResolver() {
+        return typed(PLACEHOLDER_RESOLVER, DynamicPlaceholderResolver.class);
     }
 
     // typed data

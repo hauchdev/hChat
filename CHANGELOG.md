@@ -10,6 +10,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.2.5] 2026-08-05
+
+### Added
+- **Dynamic chat placeholders** — new `DynamicPlaceholderResolver` service
+  (registered in `ServiceRegistry`, used by `ChatListener`) renders
+  NoNChat-style tokens inside every chat format, after PAPI and before the
+  message is inserted:
+  - `[ping]` — colored latency indicator with configurable symbol, ms
+    value, thresholds and colors (`placeholders.ping.*`; green ≤ `good-max`,
+    yellow ≤ `medium-max`, red above).
+  - `[item]` — main-hand item with a custom tooltip on hover (name,
+    enchantments, durability bar, lore), built from version-safe APIs that
+    work on every supported Minecraft version.
+  - `[coords]` / `[world]` — player position and world name
+    (`placeholders.coords.format`, `placeholders.world.format`).
+  - `[afk]` — `[AFK]` prefix when the player is away, detected through a
+    configurable PAPI placeholder (`placeholders.afk.*`, default
+    `%essentials_afk%`).
+- **Config v3** — `config.yml` bumped to `config-version: 3` with a new
+  `placeholders:` section; the existing migration merges the new keys into
+  already-deployed configs automatically.
+
+### Changed
+- **ChatListener** resolves dynamic tokens at the `Component` level
+  (`replaceText`) and inserts `{message}` as its own component, so tokens
+  typed by players are never interpreted as placeholders while message
+  color codes and PAPI placeholders keep working exactly as before.
+- **Single version source** — the project now uses Maven CI-friendly
+  versions: the `<revision>` property in the root `pom.xml` is the only
+  place the plugin version is defined. Every child module's `<parent>`
+  reference, the shaded jar name and the filtered `plugin.yml` pick it up
+  automatically (or override per build with `-Drevision=x.y.z`). Releasing
+  no longer means editing 14 POM files.
+
+---
+
 ## [1.2.4] 2026-08-05
 
 ### Added

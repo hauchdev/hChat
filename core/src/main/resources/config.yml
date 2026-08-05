@@ -1,6 +1,6 @@
 # Do not edit! Used to auto-migrate this file when new options
 # are added in future releases (your settings are always kept).
-config-version: 2
+config-version: 3
 
 lang: en
 debug: false
@@ -29,6 +29,47 @@ chat:
     admin:
       permission: hchat.chat.format.admin
       format: "&c&lADMIN &8» &c{prefix}{player}{suffix} &8: &7{message}"
+
+# ─── Dynamic placeholders ─────────────────────────────────────
+# Tokens rendered by hChat itself inside chat formats, before PAPI:
+#   [ping]   colored latency indicator (green <= good-max, yellow <= medium-max, red above)
+#   [item]   item in the main hand, hover shows a NoNChat-style tooltip (name, enchants, durability bar, lore)
+#   [coords] player coordinates (x, y, z)
+#   [world]  current world name
+#   [afk]    "[AFK]" prefix when the player is away (checked via a PAPI placeholder)
+#
+# Example format: "[ping] [afk]&7{player}&8: &f{message}"
+placeholders:
+  ping:
+    enabled: true
+    symbol: "▪"
+    # Append the latency value next to the symbol (e.g. "▪ 23ms").
+    show-value: true
+    value-suffix: "ms"
+    # Latency tiers: green <= good-max, yellow <= medium-max, red above.
+    good-max: 80
+    medium-max: 150
+    good-color: "&a"
+    medium-color: "&e"
+    bad-color: "&c"
+    value-color: "&7"
+  item:
+    enabled: true
+  coords:
+    enabled: true
+    format: "&7({x}, {y}, {z})"
+  world:
+    enabled: true
+    format: "&7{world}"
+  afk:
+    enabled: true
+    # PAPI placeholder that reports the AFK state (EssentialsX, CMI...).
+    placeholder: "%essentials_afk%"
+    # Values that count as "afk", compared case-insensitively.
+    afk-values:
+      - "yes"
+      - "true"
+    format: "&c[AFK]&r "
 
 welcome:
   # Broadcast message on entry. Supports {player}, and PAPI placeholders.

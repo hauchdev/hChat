@@ -5,6 +5,7 @@ import dev.hauch.hchat.config.PluginConfig;
 import dev.hauch.hchat.config.PluginMessages;
 import dev.hauch.hchat.manager.ChannelManager;
 import dev.hauch.hchat.model.ChatChannel;
+import dev.hauch.hchat.service.DynamicPlaceholderResolver;
 import dev.hauch.hchat.utils.MessageFormatter;
 import dev.hauch.hchat.utils.WordFilter;
 import io.papermc.paper.event.player.AsyncChatEvent;
@@ -47,18 +48,21 @@ public class ChatListener implements Listener {
     private final PluginMessages messages;
     private final WordFilter wordFilter;
     private final ChannelManager channelManager;
+    private final DynamicPlaceholderResolver placeholderResolver;
 
     // make ChatListener
     public ChatListener(Plugin plugin,
                         PluginConfig config,
                         PluginMessages messages,
                         WordFilter wordFilter,
-                        ChannelManager channelManager) {
+                        ChannelManager channelManager,
+                        DynamicPlaceholderResolver placeholderResolver) {
         this.plugin = plugin;
         this.config = config;
         this.messages = messages;
         this.wordFilter = wordFilter;
         this.channelManager = channelManager;
+        this.placeholderResolver = placeholderResolver;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -143,34 +147,40 @@ public class ChatListener implements Listener {
         String format = channel.hasFormat() ? channel.format()
                 : config.resolveChatFormat(sender);
 
+        // The format only depends on the sender, so build it once instead of
+        // once per viewer: PAPI, dynamic tokens ([ping] [item] [coords]
+        // [world] [afk]) and the message are all resolved before the renderer.
+        String resolved = format
+                .replace("{prefix}", "%vault_prefix%")
+                .replace("{suffix}", "%vault_suffix%")
+                .replace("{player}", sender.getName());
+        resolved = applyPlaceholders(resolved, sender);
+
+        Component rendered = MessageFormatter.format(resolved);
+
+        // tokens are resolved before {message} is inserted, so tokens typed
+        // by players stay literal
+        rendered = placeholderResolver.resolve(rendered, sender);
+
+        // {message} is appended last as its own component - color codes and
+        // PAPI placeholders inside the message keep working as before
+        String messageText = PlainTextComponentSerializer.plainText()
+                .serialize(event.message());
+        rendered = rendered.replaceText(b -> b.matchLiteral("{message}")
+                .replacement(MessageFormatter.format(applyPlaceholders(messageText, sender))));
+        Component renderedFormat = rendered;
+
         event.renderer((source, sourceDisplayName, message, viewer) -> {
-            String resolved = format
-                    .replace("{prefix}", "%vault_prefix%")
-                    .replace("{suffix}", "%vault_suffix%")
-                    .replace("{player}", source.getName())
-                    .replace("{message}", PlainTextComponentSerializer.plainText().serialize(message));
-            try {
-                if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
-                    resolved = me.clip.placeholderapi.PlaceholderAPI.setPlaceholders(source, resolved);
-                }
-            } catch (Throwable placeholderFailure) {
-                plugin.getLogger().warning(
-                        "[ChatListener] PlaceholderAPI substitution failed"
-                                + " for player '" + source.getName() + "': "
-                                + placeholderFailure.getMessage());
-            }
-
-            Component rendered = MessageFormatter.format(resolved);
-
+            Component line = renderedFormat;
             // let receivers click to join this channel (like NoNChat)
             if (!defaultChannel && viewer instanceof Player v
                     && channelManager.canSee(v, channel)) {
-                rendered = rendered.hoverEvent(HoverEvent.showText(MessageFormatter.format(
+                line = line.hoverEvent(HoverEvent.showText(MessageFormatter.format(
                                 messages.getString("channel-click-hover"),
                                 Map.of("channel", channel.id()))))
                         .clickEvent(ClickEvent.runCommand("/channel " + channel.id()));
             }
-            return rendered;
+            return line;
         });
 
         // 9. mentions - only players who can actually see the message
@@ -256,6 +266,21 @@ public class ChatListener implements Listener {
             }
         }
         return result;
+    }
+
+    // apply PAPI placeholders, logging failures
+    private String applyPlaceholders(String text, Player source) {
+        try {
+            if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+                return me.clip.placeholderapi.PlaceholderAPI.setPlaceholders(source, text);
+            }
+        } catch (Throwable placeholderFailure) {
+            plugin.getLogger().warning(
+                    "[ChatListener] PlaceholderAPI substitution failed"
+                            + " for player '" + source.getName() + "': "
+                            + placeholderFailure.getMessage());
+        }
+        return text;
     }
 
     // mentions notify

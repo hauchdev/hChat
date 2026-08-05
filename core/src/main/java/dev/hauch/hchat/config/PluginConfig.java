@@ -26,7 +26,7 @@ public class PluginConfig {
      * startup (or /hchat reload) the missing keys are merged from the
      * bundled default file, so users never have to delete config.yml.
      */
-    private static final int CONFIG_VERSION = 2;
+    private static final int CONFIG_VERSION = 3;
 
     private final Plugin plugin;
     private FileConfiguration config;
@@ -395,6 +395,82 @@ public class PluginConfig {
             }
         }
         return getDefaultChatFormat();
+    }
+
+    // is dynamic placeholder enabled
+    public boolean isPlaceholderEnabled(String name) {
+        return config.getBoolean("placeholders." + name + ".enabled", true);
+    }
+
+    // get ping symbol
+    public String getPingSymbol() {
+        return config.getString("placeholders.ping.symbol", "▪");
+    }
+
+    // is ping value shown
+    public boolean isPingValueShown() {
+        return config.getBoolean("placeholders.ping.show-value", true);
+    }
+
+    // get ping value suffix
+    public String getPingValueSuffix() {
+        return config.getString("placeholders.ping.value-suffix", "ms");
+    }
+
+    // get ping good max
+    public int getPingGoodMax() {
+        return config.getInt("placeholders.ping.good-max", 80);
+    }
+
+    // get ping medium max
+    public int getPingMediumMax() {
+        return config.getInt("placeholders.ping.medium-max", 150);
+    }
+
+    // get ping good color
+    public String getPingGoodColor() {
+        return config.getString("placeholders.ping.good-color", "&a");
+    }
+
+    // get ping medium color
+    public String getPingMediumColor() {
+        return config.getString("placeholders.ping.medium-color", "&e");
+    }
+
+    // get ping bad color
+    public String getPingBadColor() {
+        return config.getString("placeholders.ping.bad-color", "&c");
+    }
+
+    // get ping value color
+    public String getPingValueColor() {
+        return config.getString("placeholders.ping.value-color", "&7");
+    }
+
+    // get coords format
+    public String getCoordsFormat() {
+        return config.getString("placeholders.coords.format", "&7({x}, {y}, {z})");
+    }
+
+    // get world format
+    public String getWorldFormat() {
+        return config.getString("placeholders.world.format", "&7{world}");
+    }
+
+    // get afk placeholder
+    public String getAfkPlaceholder() {
+        return config.getString("placeholders.afk.placeholder", "%essentials_afk%");
+    }
+
+    // get afk values
+    public List<String> getAfkValues() {
+        List<String> values = config.getStringList("placeholders.afk.afk-values");
+        return values.isEmpty() ? List.of("yes", "true") : values;
+    }
+
+    // get afk format
+    public String getAfkFormat() {
+        return config.getString("placeholders.afk.format", "&c[AFK]&r ");
     }
 
     // is welcome enabled

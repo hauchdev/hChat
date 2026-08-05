@@ -8,7 +8,7 @@
     <parent>
         <groupId>dev.hauch</groupId>
         <artifactId>hchat</artifactId>
-        <version>1.2.4</version>
+        <version>${revision}</version>
     </parent>
 
     <artifactId>v1_20_R3</artifactId>

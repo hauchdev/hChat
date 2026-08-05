@@ -296,6 +296,26 @@ The renderer resolves every entry in two passes: first placeholders are
 substituted, then `MessageFormatter` parses `&`-color codes and hex
 (`&#RRGGBB`) so styling works everywhere.
 
+#### 🎯 Dynamic chat tokens
+
+hChat renders the following NoNChat-style tokens itself, inside every chat
+format (default format, `chat.formats.*` and channel formats):
+
+| Token      | Replaced with                                                    |
+|------------|------------------------------------------------------------------|
+| `[ping]`   | Colored latency indicator (green ≤ `good-max`, yellow ≤ `medium-max`, red above) with optional `ms` value |
+| `[item]`   | Main-hand item; hover shows a tooltip with name, enchantments, durability bar and lore |
+| `[coords]` | Player position as `x, y, z`                                     |
+| `[world]`  | Current world name                                               |
+| `[afk]`    | `[AFK]` prefix when the player is away (detected through a PAPI placeholder) |
+
+Example format: `"[ping] [afk]&7{player}&8: &f{message}"`. Each token
+can be enabled/disabled and tuned under the `placeholders:` section of
+`config.yml` (ping colors/thresholds, coords/world formats, the AFK
+placeholder and its `afk-values`). Tokens are resolved at the `Component`
+level after PAPI, so a literal `[ping]` typed by a player is never
+turned into an indicator.
+
 ---
 
 ## 🌐 Localization
@@ -441,7 +461,7 @@ Phase 5 for the planned bridge.
 
 ## 🛠️ Building from Source
 
-Requirements: **JDK 17** and **Maven 3.8+**.
+Requirements: **JDK 21** and **Maven 3.5+**.
 
 ```bash
 # Clone the repository
@@ -451,8 +471,14 @@ cd hChat
 # Compile & package
 mvn clean package
 
-# The shaded JAR is at: target/hchat-<version>.jar
+# The shaded JAR is at: plugin-dist/target/hChat-<version>.jar
 ```
+
+> ℹ️ **Releases** — the plugin version lives in **one place**: the
+> `<revision>` property at the top of the root `pom.xml`. Change it there
+> (or pass `-Drevision=1.3.0` to Maven) and every module, the filtered
+> `plugin.yml` version and the final jar name follow automatically. You
+> never have to touch the other 13 POM files.
 
 CI is wired through `.github/workflows/build.yml`: every push to `dev`
 runs `mvn clean verify`. Tagged `v*` builds additionally publish a
