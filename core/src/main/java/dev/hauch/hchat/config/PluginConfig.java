@@ -2,10 +2,16 @@ package dev.hauch.hchat.config;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -14,6 +20,13 @@ import java.util.Set;
 
 // class PluginConfig
 public class PluginConfig {
+
+    /**
+     * Bump this value whenever config.yml gains new keys. On the next
+     * startup (or /hchat reload) the missing keys are merged from the
+     * bundled default file, so users never have to delete config.yml.
+     */
+    private static final int CONFIG_VERSION = 2;
 
     private final Plugin plugin;
     private FileConfiguration config;
@@ -33,8 +46,64 @@ public class PluginConfig {
         plugin.reloadConfig();
         this.config = plugin.getConfig();
 
+        migrateConfig();
+
         this.language = config.getString("lang", "en");
         this.debug = config.getBoolean("debug", false);
+    }
+
+    /**
+     * Adds every key that exists in the bundled default config.yml but is
+     * missing from the on-disk file. Existing user values are preserved.
+     * The file is only rewritten when something actually changed, so
+     * comments and formatting survive migrations that add nothing.
+     */
+    private void migrateConfig() {
+        int storedVersion = config.getInt("config-version", 0);
+        if (storedVersion >= CONFIG_VERSION) return;
+
+        FileConfiguration defaults = loadDefaultConfig();
+        if (defaults == null) return;
+
+        boolean changed = false;
+        for (String key : defaults.getKeys(true)) {
+            boolean defaultIsSection = defaults.isConfigurationSection(key);
+            if (!config.contains(key)) {
+                if (defaultIsSection) continue; // created implicitly by children
+                config.set(key, defaults.get(key));
+                changed = true;
+            } else if (config.isConfigurationSection(key) != defaultIsSection) {
+                // type conflict: the user value cannot host the new
+                // options, so the default takes over for this path
+                config.set(key, defaults.get(key));
+                changed = true;
+            }
+        }
+
+        config.set("config-version", CONFIG_VERSION);
+        if (!changed) return; // nothing new - keep the file untouched
+
+        try {
+            config.save(new File(plugin.getDataFolder(), "config.yml"));
+            plugin.getLogger().info("[hChat] Config migrated to v" + CONFIG_VERSION
+                    + " - new options added, your settings were kept.");
+        } catch (IOException e) {
+            plugin.getLogger().warning("Failed to save migrated config: "
+                    + e.getMessage());
+        }
+    }
+
+    // load the default config.yml bundled inside the jar
+    private FileConfiguration loadDefaultConfig() {
+        try (InputStream in = plugin.getResource("config.yml")) {
+            if (in == null) return null;
+            return YamlConfiguration.loadConfiguration(
+                    new InputStreamReader(in, StandardCharsets.UTF_8));
+        } catch (IOException e) {
+            plugin.getLogger().warning("Failed to read bundled config.yml: "
+                    + e.getMessage());
+            return null;
+        }
     }
 
     @NotNull
@@ -201,6 +270,11 @@ public class PluginConfig {
     // is broadcast enabled
     public boolean isBroadcastEnabled() {
         return config.getBoolean("broadcast.enabled", true);
+    }
+
+    // get broadcast cooldown ms
+    public long getBroadcastCooldownMs() {
+        return config.getLong("broadcast.cooldown-ms", 0);
     }
 
     // get broadcast format
@@ -403,5 +477,38 @@ public class PluginConfig {
     // is quit sound enabled
     public boolean isQuitSoundEnabled() {
         return config.getBoolean("quit.sound.enabled", false);
+    }
+
+    // get channels
+    public Map<String, Map<String, Object>> getChannels() {
+        Map<String, Map<String, Object>> result = new LinkedHashMap<>();
+        ConfigurationSection section = config.getConfigurationSection("channels");
+        if (section == null) return result;
+
+        for (String key : section.getKeys(false)) {
+            ConfigurationSection sub = section.getConfigurationSection(key);
+            if (sub == null) continue;
+
+            Map<String, Object> data = new HashMap<>();
+            data.put("format", sub.getString("format"));
+            data.put("range", sub.getInt("range", -1));
+            data.put("action-bar-hint", sub.getString("action-bar-hint"));
+            data.put("speak-permission", sub.getString("speak-permission"));
+            data.put("see-permission", sub.getString("see-permission"));
+            data.put("cooldown-ms", sub.getLong("cooldown-ms", 0));
+            data.put("alias", sub.getString("alias"));
+            result.put(key, data);
+        }
+        return result;
+    }
+
+    // is update checker enabled
+    public boolean isUpdateCheckerEnabled() {
+        return config.getBoolean("update-checker.enabled", true);
+    }
+
+    // notify admins on join
+    public boolean isUpdateNotifyAdmins() {
+        return config.getBoolean("update-checker.notify-admins", true);
     }
 }

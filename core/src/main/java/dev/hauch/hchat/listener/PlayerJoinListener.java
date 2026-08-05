@@ -4,6 +4,7 @@ import dev.hauch.hchat.api.platform.SoundLookup;
 import dev.hauch.hchat.config.PluginConfig;
 import dev.hauch.hchat.config.PluginMessages;
 import dev.hauch.hchat.manager.OfflineMessageStore;
+import dev.hauch.hchat.update.UpdateChecker;
 import dev.hauch.hchat.utils.MessageFormatter;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.bukkit.Sound;
@@ -25,16 +26,19 @@ public class PlayerJoinListener implements Listener {
     private final PluginConfig config;
     private final PluginMessages messages;
     private final OfflineMessageStore offlineStore;
+    private final UpdateChecker updateChecker;
 
     // make PlayerJoinListener
     public PlayerJoinListener(Plugin plugin,
                               PluginConfig config,
                               PluginMessages messages,
-                              OfflineMessageStore offlineStore) {
+                              OfflineMessageStore offlineStore,
+                              UpdateChecker updateChecker) {
         this.plugin = plugin;
         this.config = config;
         this.messages = messages;
         this.offlineStore = offlineStore;
+        this.updateChecker = updateChecker;
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -92,6 +96,13 @@ public class PlayerJoinListener implements Listener {
                     config.getWelcomeSound(),
                     config.getWelcomeSoundVolume(),
                     config.getWelcomeSoundPitch());
+        }
+
+        if (config.isUpdateNotifyAdmins()
+                && updateChecker.isChecked()
+                && updateChecker.isUpdateAvailable()
+                && player.hasPermission("hchat.update")) {
+            player.sendMessage(updateChecker.updateMessage(messages));
         }
     }
 

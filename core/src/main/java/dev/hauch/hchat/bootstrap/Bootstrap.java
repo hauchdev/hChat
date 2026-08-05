@@ -4,6 +4,7 @@ import dev.hauch.hchat.api.HChatProvider;
 import dev.hauch.hchat.api.platform.Platform;
 import dev.hauch.hchat.api.platform.PlatformAdapter;
 import dev.hauch.hchat.command.BroadcastCommand;
+import dev.hauch.hchat.command.ChannelCommand;
 import dev.hauch.hchat.command.ClearCommand;
 import dev.hauch.hchat.command.HChatCommand;
 import dev.hauch.hchat.command.IgnoreCommand;
@@ -16,6 +17,7 @@ import dev.hauch.hchat.listener.ChatListener;
 import dev.hauch.hchat.listener.PlayerJoinListener;
 import dev.hauch.hchat.listener.PlayerQuitListener;
 import dev.hauch.hchat.manager.AutoBroadcastManager;
+import dev.hauch.hchat.manager.ChannelManager;
 import dev.hauch.hchat.manager.DndManager;
 import dev.hauch.hchat.manager.IgnoreManager;
 import dev.hauch.hchat.manager.LanguageManager;
@@ -32,8 +34,10 @@ import dev.hauch.hchat.registry.ServiceRegistry;
 import dev.hauch.hchat.service.BroadcastService;
 import dev.hauch.hchat.service.ConfigurationService;
 import dev.hauch.hchat.storage.IgnoreStorage;
+import dev.hauch.hchat.storage.PlayerChannelStorage;
 import dev.hauch.hchat.storage.PlayerLangStorage;
 import dev.hauch.hchat.storage.YamlIgnoreStorage;
+import dev.hauch.hchat.update.UpdateChecker;
 import dev.hauch.hchat.utils.ChatLogger;
 import dev.hauch.hchat.utils.WordFilter;
 import org.bukkit.Bukkit;
@@ -98,6 +102,7 @@ public final class Bootstrap {
         }
         ctx.config.reloadConfig();
         ctx.messages.reload();
+        ctx.channelManager.reload();
         ctx.ignoreManager.reload();
         ctx.playerLangManager.saveAll();
         ctx.autoBroadcastManager.reload();
@@ -131,10 +136,13 @@ public final class Bootstrap {
         PluginConfig config = new PluginConfig(plugin);
         PluginMessages messages = new PluginMessages(plugin);
 
+        UpdateChecker updateChecker = new UpdateChecker(plugin);
+
         plugin.saveResource("lang/lang_en.yml", false);
 
         IgnoreStorage ignoreStorage = new YamlIgnoreStorage(plugin);
         PlayerLangStorage playerLangStorage = new PlayerLangStorage(plugin);
+        PlayerChannelStorage playerChannelStorage = new PlayerChannelStorage(plugin);
 
         PlayerLangManager playerLangManager = new PlayerLangManager(playerLangStorage);
         LanguageManager languageManager = new LanguageManager(plugin, playerLangManager);
@@ -142,6 +150,8 @@ public final class Bootstrap {
         ChatLogger chatLogger = new ChatLogger(plugin, config);
         ConfigurationService configurationService =
                 new ConfigurationService(config, messages);
+
+        ChannelManager channelManager = new ChannelManager(config, playerChannelStorage);
 
         IgnoreManager ignoreManager = new IgnoreManager(ignoreStorage);
         SpyManager spyManager = new SpyManager();
@@ -162,6 +172,7 @@ public final class Bootstrap {
         serviceRegistry.registerAutoBroadcastManager(autoBroadcastManager);
         serviceRegistry.registerChatLogger(chatLogger);
 
+        managerRegistry.registerChannelManager(channelManager);
         managerRegistry.registerIgnoreManager(ignoreManager);
         managerRegistry.registerSpyManager(spyManager);
         managerRegistry.registerMessageHistory(messageHistory);
@@ -199,6 +210,8 @@ public final class Bootstrap {
                 configurationService,
                 ignoreStorage,
                 playerLangStorage,
+                playerChannelStorage,
+                channelManager,
                 ignoreManager,
                 spyManager,
                 messageHistory,
@@ -213,6 +226,7 @@ public final class Bootstrap {
                 serviceRegistry,
                 managerRegistry,
                 placeholderExpansion,
+                updateChecker,
                 discordSrvEnabled);
     }
 
@@ -228,7 +242,10 @@ public final class Bootstrap {
         attachCommand(ctx, "reply",
                 new ReplyCommand(plugin, ctx.config, ctx.messages, ctx.messageHistory));
         attachCommand(ctx, "hchat",
-                new HChatCommand(plugin, ctx.config, ctx.messages, ctx.playerLangManager));
+                new HChatCommand(plugin, ctx.config, ctx.messages, ctx.playerLangManager,
+                        ctx.updateChecker));
+        attachCommand(ctx, "channel",
+                new ChannelCommand(ctx.messages, ctx.channelManager));
         attachCommand(ctx, "clear",
                 new ClearCommand(plugin, ctx.config, ctx.messages));
         attachCommand(ctx, "ignore",
@@ -236,7 +253,8 @@ public final class Bootstrap {
         attachCommand(ctx, "spy",
                 new SpyCommand(plugin, ctx.config, ctx.messages, ctx.spyManager));
         attachCommand(ctx, "broadcast",
-                new BroadcastCommand(plugin, ctx.config, ctx.messages, broadcastOf(ctx)));
+                new BroadcastCommand(plugin, ctx.config, ctx.messages, broadcastOf(ctx),
+                        ctx.channelManager));
 
         for (CommandHolder holder : ctx.commandRegistry.all()) {
             try {
@@ -277,10 +295,11 @@ public final class Bootstrap {
         WordFilter wordFilter = new WordFilter(ctx.config);
 
         ctx.listenerRegistry.register("chat",
-                new ChatListener(plugin, ctx.config, ctx.messages, wordFilter));
+                new ChatListener(plugin, ctx.config, ctx.messages, wordFilter,
+                        ctx.channelManager));
         ctx.listenerRegistry.register("join",
                 new PlayerJoinListener(plugin, ctx.config, ctx.messages,
-                        ctx.offlineMessageStore));
+                        ctx.offlineMessageStore, ctx.updateChecker));
         ctx.listenerRegistry.register("quit",
                 new PlayerQuitListener(plugin, ctx.config, ctx.messages));
 
@@ -297,8 +316,18 @@ public final class Bootstrap {
 
     // schedule tasks
     private static void scheduleTasks(PluginContext ctx) {
-        
         ctx.autoBroadcastManager.reload();
+
+        if (ctx.config.isUpdateCheckerEnabled()) {
+            ctx.updateChecker.checkAsync(() -> {
+                if (ctx.updateChecker.isUpdateAvailable()) {
+                    LOG.info("[UpdateChecker] A new version is available: "
+                            + ctx.updateChecker.latestVersion()
+                            + " (current: " + ctx.updateChecker.currentVersion()
+                            + ") - " + ctx.updateChecker.releaseUrl());
+                }
+            });
+        }
     }
 
     // context data

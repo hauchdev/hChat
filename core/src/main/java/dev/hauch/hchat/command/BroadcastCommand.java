@@ -2,6 +2,7 @@ package dev.hauch.hchat.command;
 
 import dev.hauch.hchat.config.PluginConfig;
 import dev.hauch.hchat.config.PluginMessages;
+import dev.hauch.hchat.manager.ChannelManager;
 import dev.hauch.hchat.service.BroadcastService;
 import dev.hauch.hchat.utils.MessageFormatter;
 import org.bukkit.command.Command;
@@ -15,6 +16,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 // class BroadcastCommand
@@ -27,16 +30,19 @@ public class BroadcastCommand implements CommandExecutor, TabCompleter {
     private final PluginConfig config;
     private final PluginMessages messages;
     private final BroadcastService broadcastService;
+    private final ChannelManager channelManager;
 
     // make BroadcastCommand
     public BroadcastCommand(Plugin plugin,
                             PluginConfig config,
                             PluginMessages messages,
-                            BroadcastService broadcastService) {
+                            BroadcastService broadcastService,
+                            ChannelManager channelManager) {
         this.plugin = plugin;
         this.config = config;
         this.messages = messages;
         this.broadcastService = broadcastService;
+        this.channelManager = channelManager;
     }
 
     @Override
@@ -72,6 +78,17 @@ public class BroadcastCommand implements CommandExecutor, TabCompleter {
                     messages.getString("broadcast-no-permission-color")));
             return true;
         }
+
+        long cooldownMs = config.getBroadcastCooldownMs();
+        long remainingMs = channelManager.cooldownRemaining(
+                player, "broadcast", cooldownMs);
+        if (remainingMs > 0) {
+            player.sendMessage(MessageFormatter.format(
+                    messages.getString("broadcast-cooldown"),
+                    Map.of("seconds", String.format(Locale.ROOT, "%.1f", remainingMs / 1000.0))));
+            return true;
+        }
+        channelManager.recordCooldown(player, "broadcast");
 
         broadcastService.broadcast(rawMessage);
         player.sendMessage(MessageFormatter.format(messages.getString("message-broadcasted")));

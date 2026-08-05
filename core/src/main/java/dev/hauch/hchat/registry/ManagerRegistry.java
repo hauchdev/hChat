@@ -1,5 +1,6 @@
 package dev.hauch.hchat.registry;
 
+import dev.hauch.hchat.manager.ChannelManager;
 import dev.hauch.hchat.manager.DndManager;
 import dev.hauch.hchat.manager.IgnoreManager;
 import dev.hauch.hchat.manager.LanguageManager;
@@ -14,6 +15,11 @@ public final class ManagerRegistry extends Registry<Object> {
     // make ManagerRegistry
     public ManagerRegistry() {
         super("Manager");
+    }
+
+    // add channel manager
+    public void registerChannelManager(ChannelManager manager) {
+        register("channels", manager);
     }
 
     // add ignore manager

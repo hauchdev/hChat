@@ -2,7 +2,7 @@ name: hChat
 version: '${version}'
 
 main: dev.hauch.hchat.HChat
-api-version: '1.20'
+api-version: '1.18'
 load: STARTUP
 
 authors: [ Hauchdev ]
@@ -25,6 +25,7 @@ permissions:
       - hchat.reply
       - hchat.broadcast
       - hchat.reload
+      - hchat.update
       - hchat.help
       - hchat.clear
       - hchat.ignore
@@ -35,6 +36,7 @@ permissions:
       - hchat.lang
       - hchat.monitor.filter
       - hchat.bypass-log
+      - hchat.channel
 
   hchat.message:
     description: Allows /message command
@@ -44,6 +46,9 @@ permissions:
     default: true
   hchat.reload:
     description: Allows /hchat reload command
+    default: op
+  hchat.update:
+    description: Allows /hchat update command and update notifications
     default: op
   hchat.help:
     description: Allows /hchat help command
@@ -70,6 +75,9 @@ permissions:
     default: op
   hchat.bypass-log:
     default: op
+  hchat.channel:
+    description: Allows /channel command
+    default: true
 
 commands:
   message:
@@ -110,4 +118,11 @@ commands:
     aliases:
       - bc
     permission: hchat.broadcast
+    permission-message: You do not have <permission> to use this command!
+  channel:
+    description: Switch chat channels.
+    usage: /channel [name]
+    aliases:
+      - ch
+    permission: hchat.channel
     permission-message: You do not have <permission> to use this command!

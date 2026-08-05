@@ -1,8 +1,18 @@
+# Do not edit! Used to auto-migrate this file when new options
+# are added in future releases (your settings are always kept).
+config-version: 2
+
 lang: en
 debug: false
 
+update-checker:
+  # Check releases for new versions on startup.
+  enabled: true
+  # Notify players with hchat.update permission on join.
+  notify-admins: true
+
 chat:
-  default-format: "&7{pprefix}{player}{psuffix}&8: &f{message}"
+  default-format: "&7%luckperms_prefix% {player} %luckperms_suffix%&8: &f{message}"
 
   hex-colors: true
 
@@ -92,8 +102,56 @@ hover-text:
     - "&7"
     - "&eClick to send a private message"
 
+# ─── Chat channels ────────────────────────────────────────────────
+# Each channel has its own format, range (-1 = no limit), optional
+# speak/see permissions, optional cooldown and optional chat alias.
+#
+# Available format placeholders: {prefix} {suffix} {player} {message}
+#
+# In-game:
+#   /channel            - list channels
+#   /channel <name>     - switch your active channel
+#   #staff <message>    - send to a channel from anywhere via alias
+#
+# A player's active channel is remembered between sessions.
+channels:
+  global:
+    # -1 = no limit (whole server). Default channel everyone starts in.
+    # Its format comes from chat.default-format / chat.formats
+    # (permission-based vip/mvp/admin), so leave `format` empty here.
+    range: -1
+
+  local:
+    # Distance-based local chat: only players within `range` blocks
+    # see it. Players just outside the range get the action-bar hint.
+    format: "&8[Local] &7{player} &8» &f{message}"
+    range: 80
+    action-bar-hint: "&eThere are people talking near you"
+    alias: "#l"
+
+  staff:
+    # Only players with the speak permission can send; only players
+    # with the see permission receive it.
+    format: "&c[Staff] {player} &8» &f{message}"
+    speak-permission: hchat.channel.staff
+    see-permission: hchat.channel.staff.see
+    alias: "#staff"
+
+  vip:
+    format: "&e[VIP] {player} &8» &f{message}"
+    speak-permission: hchat.chat.format.vip
+    alias: "#vip"
+
+  trade:
+    # Anti-spam: one message every 5 seconds per player in this channel.
+    format: "&6[Trade] {player} &8» &f{message}"
+    cooldown-ms: 5000
+    alias: "#trade"
+
 broadcast:
   enabled: true
+  # Anti-spam for /broadcast (0 = disabled). Shared with channel cooldowns.
+  cooldown-ms: 0
   format:
     - ""
     - "&#2791F5Broadcast:"

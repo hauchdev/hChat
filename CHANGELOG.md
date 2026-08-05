@@ -10,11 +10,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [Unreleased]
+## [1.2.4] 2026-08-05
 
-### Planned
-- DiscordSRV ↔ `/msg` and `/broadcast` bridge (Phase 5 of `ROADMAP.md`).
-- Permission-based chat format (`{prefix}{player}{suffix}` style).
+### Added
+- **Chat channels** — configurable chat channels with per-channel format,
+  distance range, speak/see permissions, cooldown and chat alias (`channels:`
+  in `config.yml`). Includes distance-based **local chat** with action-bar
+  hints for nearby players, named channels (`staff`, `vip`, `trade`), alias
+  prefixes (`#staff hola`), a `/channel` command (alias `/ch`) with tab
+  completion, clickable channel switching in chat, persistent active channel
+  per player, and a configurable `/broadcast` cooldown shared with channel
+  cooldowns (`broadcast.cooldown-ms`).
+- **Update checker** — checks `hauchdev/hChat` GitHub Releases on startup
+  (`update-checker.enabled`), notifies players with the `hchat.update`
+  permission on join (`update-checker.notify-admins`), and exposes
+  `/hchat update` to force a check. The update message is clickable and
+  opens the release page.
+- **Automatic config migration** — `config.yml` now carries a
+  `config-version` marker. When a newer plugin version adds config keys,
+  they are merged from the bundled default file on next startup/reload,
+  preserving every existing user setting. No more deleting `config.yml`.
 
 ---
 

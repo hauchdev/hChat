@@ -4,6 +4,7 @@ import dev.hauch.hchat.bootstrap.Bootstrap;
 import dev.hauch.hchat.config.PluginConfig;
 import dev.hauch.hchat.config.PluginMessages;
 import dev.hauch.hchat.manager.PlayerLangManager;
+import dev.hauch.hchat.update.UpdateChecker;
 import dev.hauch.hchat.utils.MessageFormatter;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -12,6 +13,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Map;
+
 // class HChatCommand
 public class HChatCommand implements CommandExecutor {
 
@@ -19,16 +22,19 @@ public class HChatCommand implements CommandExecutor {
     private final PluginConfig config;
     private final PluginMessages messages;
     private final PlayerLangManager playerLangManager;
+    private final UpdateChecker updateChecker;
 
     // make HChatCommand
     public HChatCommand(Plugin plugin,
                         PluginConfig config,
                         PluginMessages messages,
-                        PlayerLangManager playerLangManager) {
+                        PlayerLangManager playerLangManager,
+                        UpdateChecker updateChecker) {
         this.plugin = plugin;
         this.config = config;
         this.messages = messages;
         this.playerLangManager = playerLangManager;
+        this.updateChecker = updateChecker;
     }
 
     @Override
@@ -44,6 +50,7 @@ public class HChatCommand implements CommandExecutor {
             case "reload" -> doReload(sender);
             case "help" -> sendHelp(sender);
             case "lang" -> doLang(sender, args);
+            case "update" -> doUpdate(sender);
             default -> sendHelp(sender);
         }
         return true;
@@ -63,6 +70,27 @@ public class HChatCommand implements CommandExecutor {
             plugin.getLogger().severe("Reload failed: " + e.getMessage());
             sender.sendMessage(MessageFormatter.format(messages.getString("reload-failed")));
         }
+    }
+
+    // do update
+    private void doUpdate(CommandSender sender) {
+        if (!sender.hasPermission("hchat.update")) {
+            sender.sendMessage(MessageFormatter.format(messages.getString("no-permission")));
+            return;
+        }
+        sender.sendMessage(MessageFormatter.format(messages.getString("update-checking")));
+        updateChecker.checkAsync(() -> {
+            if (updateChecker.isUpdateAvailable()) {
+                sender.sendMessage(updateChecker.updateMessage(messages));
+            } else if (updateChecker.isChecked()) {
+                sender.sendMessage(MessageFormatter.format(
+                        messages.getString("update-up-to-date"),
+                        Map.of("current", updateChecker.currentVersion())));
+            } else {
+                sender.sendMessage(MessageFormatter.format(
+                        messages.getString("update-check-failed")));
+            }
+        });
     }
 
     // do lang
@@ -89,5 +117,7 @@ public class HChatCommand implements CommandExecutor {
         sender.sendMessage(MessageFormatter.format(messages.getString("ignore-command")));
         sender.sendMessage(MessageFormatter.format(messages.getString("spy-command")));
         sender.sendMessage(MessageFormatter.format(messages.getString("reply-command")));
+        sender.sendMessage(MessageFormatter.format(messages.getString("update-command")));
+        sender.sendMessage(MessageFormatter.format(messages.getString("channel-command")));
     }
 }
