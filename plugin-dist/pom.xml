@@ -80,6 +80,12 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- bStats metrics - bundled and relocated into the final jar. -->
+        <dependency>
+            <groupId>org.bstats</groupId>
+            <artifactId>bstats-bukkit</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -140,8 +146,18 @@
                                     <include>dev.hauch:v1_21_R1</include>
                                     <include>dev.hauch:v1_21_R2</include>
                                     <include>dev.hauch:v1_21_R3</include>
+                                    <include>org.bstats:*</include>
                                 </includes>
                             </artifactSet>
+
+                            <!-- Keep bStats out of the global org.bstats package so
+                                 it cannot collide with other plugins' copies. -->
+                            <relocations>
+                                <relocation>
+                                    <pattern>org.bstats</pattern>
+                                    <shadedPattern>${shade.prefix}.bstats</shadedPattern>
+                                </relocation>
+                            </relocations>
 
                             <filters>
                                 <filter>

@@ -26,7 +26,7 @@ public class PluginConfig {
      * startup (or /hchat reload) the missing keys are merged from the
      * bundled default file, so users never have to delete config.yml.
      */
-    private static final int CONFIG_VERSION = 3;
+    private static final int CONFIG_VERSION = 4;
 
     private final Plugin plugin;
     private FileConfiguration config;
@@ -115,6 +115,11 @@ public class PluginConfig {
     // is debugged
     public boolean isDebug() {
         return debug;
+    }
+
+    // is metrics enabled
+    public boolean isMetricsEnabled() {
+        return config.getBoolean("metrics.enabled", true);
     }
 
     // is mention sound enabled

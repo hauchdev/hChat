@@ -10,6 +10,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.2.6] 2026-08-08
+
+### Added
+- **Command tab completion** — `/hchat` now completes its subcommands
+  (`reload`, `help`, `lang`, `update`, filtered by permission) and
+  `/hchat lang` completes the available language codes; `/message` also
+  suggests offline players (offline delivery is supported), joining the
+  existing player-name completion of `/ignore` and channel completion of
+  `/channel`.
+
 ## [1.2.5] 2026-08-05
 
 ### Added

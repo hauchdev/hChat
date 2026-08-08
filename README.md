@@ -171,6 +171,13 @@ on first start. Edit them, then run `/hchat reload`.
 | `/hchat help`                        | —                              | Show the in-game help menu                                 | `hchat.help`         |
 | `/hchat lang <lang>`                 | —                              | Switch your own player language                            | `hchat.lang`         |
 
+> ⌨️ **Tab completion** — every command supports it where it makes sense:
+> `/hchat` completes its subcommands (`reload`, `help`, `lang`, `update`,
+> filtered by permission) and `/hchat lang` completes the language codes
+> from `lang/`; `/message` and `/ignore` complete online player names
+> (`/message` also suggests offline players, since it can deliver offline
+> messages); `/channel` completes the configured channel ids.
+
 ---
 
 ## 🔒 Permissions
@@ -456,6 +463,15 @@ If DiscordSRV is present at startup, hChat logs a confirmation so
 admins know the hook is registered. Forwarding of `/msg` and
 `/broadcast` to Discord is **not** implemented yet — see `ROADMAP.md`
 Phase 5 for the planned bridge.
+
+### 📊 Metrics (bStats)
+
+hChat bundles [bStats](https://bstats.org) for anonymous plugin
+statistics — no extra download needed. Server owners can disable it with
+`metrics.enabled: false` in `config.yml` or globally in
+`plugins/bStats/config.yml` (the toggle applies on the next server
+start). The plugin id is defined in `HChat.java` (`BSTATS_PLUGIN_ID`);
+register hChat at bstats.org and set it there to start collecting data.
 
 ---
 

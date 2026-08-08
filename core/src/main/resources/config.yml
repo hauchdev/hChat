@@ -1,6 +1,6 @@
 # Do not edit! Used to auto-migrate this file when new options
 # are added in future releases (your settings are always kept).
-config-version: 3
+config-version: 4
 
 lang: en
 debug: false

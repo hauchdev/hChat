@@ -248,7 +248,7 @@ public final class Bootstrap {
                 new ReplyCommand(plugin, ctx.config, ctx.messages, ctx.messageHistory));
         attachCommand(ctx, "hchat",
                 new HChatCommand(plugin, ctx.config, ctx.messages, ctx.playerLangManager,
-                        ctx.updateChecker));
+                        ctx.languageManager, ctx.updateChecker));
         attachCommand(ctx, "channel",
                 new ChannelCommand(ctx.messages, ctx.channelManager));
         attachCommand(ctx, "clear",

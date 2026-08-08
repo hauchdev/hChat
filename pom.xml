@@ -67,6 +67,7 @@
         <!-- API versions -->
         <paper.version>1.21.8-R0.1-SNAPSHOT</paper.version>
         <placeholderapi.version>2.11.6</placeholderapi.version>
+        <bstats.version>3.2.1</bstats.version>
 
         <!-- Plugin build values -->
         <plugin.name>hChat</plugin.name>
@@ -166,6 +167,14 @@
                 <artifactId>placeholderapi</artifactId>
                 <version>${placeholderapi.version}</version>
                 <scope>provided</scope>
+            </dependency>
+
+            <!-- bStats metrics - shaded into the final jar by plugin-dist. -->
+            <dependency>
+                <groupId>org.bstats</groupId>
+                <artifactId>bstats-bukkit</artifactId>
+                <version>${bstats.version}</version>
+                <scope>compile</scope>
             </dependency>
 
         </dependencies>

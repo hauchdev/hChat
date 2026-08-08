@@ -22,16 +22,20 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 // class MessageCommand
 public class MessageCommand implements CommandExecutor, TabCompleter {
+
+    /** Cap offline suggestions so tab completion stays cheap on big servers. */
+    private static final int MAX_COMPLETIONS = 50;
 
     private final Plugin plugin;
     private final PluginConfig config;
@@ -190,11 +194,25 @@ public class MessageCommand implements CommandExecutor, TabCompleter {
                                                 @NotNull String label,
                                                 @NotNull String[] args) {
         if (args.length == 1) {
-            String partial = args[0].toLowerCase();
-            return Bukkit.getOnlinePlayers().stream()
-                    .map(Player::getName)
-                    .filter(name -> name.toLowerCase().startsWith(partial))
-                    .collect(Collectors.toList());
+            String partial = args[0].toLowerCase(Locale.ROOT);
+            List<String> result = new ArrayList<>();
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                if (player.getName().toLowerCase(Locale.ROOT).startsWith(partial)) {
+                    result.add(player.getName());
+                }
+            }
+            // /msg also delivers to offline players - suggest known names too,
+            // capped so large usercaches do not stall tab completion
+            for (org.bukkit.OfflinePlayer offline : Bukkit.getOfflinePlayers()) {
+                if (result.size() >= MAX_COMPLETIONS) break;
+                String name = offline.getName();
+                if (name != null
+                        && name.toLowerCase(Locale.ROOT).startsWith(partial)
+                        && !result.contains(name)) {
+                    result.add(name);
+                }
+            }
+            return result;
         }
         return Collections.emptyList();
     }
