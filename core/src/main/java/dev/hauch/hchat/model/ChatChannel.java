@@ -14,7 +14,8 @@ public record ChatChannel(String id,
                           String speakPermission,
                           String seePermission,
                           long cooldownMs,
-                          String alias) {
+                          String alias,
+                          boolean perWorld) {
 
     // has explicit format
     public boolean hasFormat() {
@@ -44,5 +45,10 @@ public record ChatChannel(String id,
     // is unlimited range
     public boolean isUnlimited() {
         return range < 0;
+    }
+
+    // is world-scoped (messages never cross worlds)
+    public boolean hasPerWorld() {
+        return perWorld;
     }
 }

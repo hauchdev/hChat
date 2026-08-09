@@ -1,6 +1,8 @@
 package dev.hauch.hchat.utils;
 
 import dev.hauch.hchat.config.PluginConfig;
+import dev.hauch.hchat.utils.filter.ChatFilter;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,19 +10,16 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 // class WordFilter
-public class WordFilter {
-
-    // enum Action
-    public enum Action { BLOCK, MASK, WARN }
+public class WordFilter implements ChatFilter {
 
     private final PluginConfig config;
     private final List<Pattern> patterns;
-    private final Action action;
+    private final FilterAction action;
 
     public WordFilter(PluginConfig config) {
         this.config = config;
         this.patterns = new ArrayList<>();
-        this.action = parseAction(config.getWordFilterAction());
+        this.action = FilterAction.parse(config.getWordFilterAction(), FilterAction.BLOCK);
         if (!config.isWordFilterEnabled()) return;
         for (String word : config.getWordFilterWords()) {
             if (word == null || word.isBlank()) continue;
@@ -32,14 +31,16 @@ public class WordFilter {
     public boolean isEnabled() { return !patterns.isEmpty(); }
 
     // get action
-    public Action getAction() { return action; }
+    @Override
+    public FilterAction action() { return action; }
 
     // filter data
-    public Optional<String> filter(String message) {
+    @Override
+    public Optional<String> check(Player player, String message) {
         if (!isEnabled() || message == null) return Optional.empty();
         for (Pattern p : patterns) {
             if (p.matcher(message).find()) {
-                if (action == Action.MASK) {
+                if (action == FilterAction.MASK) {
                     return Optional.of(p.matcher(message).replaceAll(
                             m -> "*".repeat(m.group().length())));
                 }
@@ -47,12 +48,5 @@ public class WordFilter {
             }
         }
         return Optional.empty();
-    }
-
-    // parse action
-    private static Action parseAction(String raw) {
-        if (raw == null) return Action.BLOCK;
-        try { return Action.valueOf(raw.trim().toUpperCase()); }
-        catch (IllegalArgumentException e) { return Action.BLOCK; }
     }
 }

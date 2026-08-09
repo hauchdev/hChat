@@ -1,6 +1,7 @@
 package dev.hauch.hchat.service;
 
 import dev.hauch.hchat.config.PluginConfig;
+import dev.hauch.hchat.manager.AfkManager;
 import dev.hauch.hchat.utils.MessageFormatter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -23,10 +24,12 @@ public final class DynamicPlaceholderResolver {
             "VI", "VII", "VIII", "IX", "X"};
 
     private final PluginConfig config;
+    private final AfkManager afkManager;
 
     // make DynamicPlaceholderResolver
-    public DynamicPlaceholderResolver(PluginConfig config) {
+    public DynamicPlaceholderResolver(PluginConfig config, AfkManager afkManager) {
         this.config = config;
+        this.afkManager = afkManager;
     }
 
     // resolve all dynamic tokens inside a chat format. Tokens that do not
@@ -170,15 +173,23 @@ public final class DynamicPlaceholderResolver {
         return MessageFormatter.format(config.getWorldFormat().replace("{world}", world));
     }
 
-    // resolve [afk]: "[AFK]" prefix when the player is away
+    // resolve [afk]: "[AFK]" prefix when the player is away. Uses the
+    // built-in AfkManager (manual /afk + inactivity detection); falls back
+    // to the configured PAPI placeholder when the built-in feature is off.
     public Component resolveAfk(Player player) {
         if (!config.isPlaceholderEnabled("afk")) return Component.empty();
-        if (!isAfk(player)) return Component.empty();
+        boolean afk;
+        if (afkManager != null && afkManager.isEnabled()) {
+            afk = afkManager.isAfk(player);
+        } else {
+            afk = isAfkViaPlaceholder(player);
+        }
+        if (!afk) return Component.empty();
         return MessageFormatter.format(config.getAfkFormat());
     }
 
     // is the player afk (delegates to the configured PAPI placeholder)
-    private boolean isAfk(Player player) {
+    private boolean isAfkViaPlaceholder(Player player) {
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") == null) {
             return false;
         }

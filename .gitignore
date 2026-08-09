@@ -111,3 +111,13 @@ buildNumber.properties
 
 # Common working directory
 run/
+
+# ============================================================
+# hChat Premium - PRIVATE. The premium module source lives in
+# the hChat-Premium private repository, never in this public
+# repo. The local copy is kept here only while developing.
+# NOTE: the leading / anchors this to the repo root, so the
+# pattern cannot accidentally ignore core/.../api/premium/.
+# ============================================================
+/premium/
+

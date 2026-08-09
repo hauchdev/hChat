@@ -53,7 +53,11 @@ message-broadcasted: "&7Your broadcast was sent."
 
 # Offline messages.
 offline-message-saved: "&7Message saved for &e{target}&7. Will be delivered on next login."
-offline-message-delivered: "&eYou have pending messages."
+offline-messages-pending: "&eYou have &f{count} &epending message(s). &7Click to read."
+mail-usage: "&eUse: &b/hchat mail <read|clear|send>"
+mail-empty: "&#54A3FF[hChat] &fYou have no pending messages."
+mail-cleared: "&#54A3FF[hChat] &aPending messages cleared."
+mail-header: "&#54A3FF[hChat] &fYour pending messages:"
 
 # Message.
 invalid-usage-message: "&eUse: &b/m <player> <message>"
@@ -81,6 +85,65 @@ link-hover: "Click to open: {url}"
 
 # Block Words
 filter-warn-staff: "&c[Filter]&e {player}&7: &f{message}"
+
+# Slowmode.
+slowmode-usage: "&eUse: &b/slowmode <seconds|off|status>"
+slowmode-enabled: "&#54A3FF[hChat] &aSlowmode set to &f{seconds}&as."
+slowmode-disabled: "&#54A3FF[hChat] &aSlowmode disabled."
+slowmode-status: "&#54A3FF[hChat] &fSlowmode is &e{seconds}s&f."
+slowmode-chat-blocked: "&#54A3FF[hChat] &cSlow down! Wait &e{seconds}s &cbefore sending another message."
+
+# Chat lock.
+chatlock-usage: "&eUse: &b/chatlock <on|off|status>"
+chatlock-locked: "&#54A3FF[hChat] &cChat locked by &e{player}&c."
+chatlock-unlocked: "&#54A3FF[hChat] &aChat unlocked by &e{player}&a."
+chatlock-status-locked: "&#54A3FF[hChat] &cChat is locked (by {player})."
+chatlock-status-unlocked: "&#54A3FF[hChat] &aChat is unlocked."
+chatlock-chat-locked: "&#54A3FF[hChat] &cThe chat is currently locked."
+
+# DND.
+invalid-usage-dnd: "&eUse: &b/dnd [on|off]"
+dnd-enabled: "&fDND: &eEnabled"
+dnd-disabled: "&fDND: &eDisabled"
+dnd-blocked: "&e{player} has DND enabled and is not receiving messages."
+
+# Staff chat.
+invalid-usage-sc: "&eUse: &b/sc <message>"
+
+# Ping.
+ping-message: "&eYour ping: &f{ping}ms"
+ping-others: "&e{player}&7's ping: &f{ping}ms"
+
+# Seen.
+invalid-usage-seen: "&eUse: &b/seen <player>"
+seen-message: "&#54A3FF[hChat] &f{player} was last seen &e{minutes} minute(s) ago."
+seen-none: "&#54A3FF[hChat] &f{player} has no recent messages."
+
+# Mentions.
+mention-cooldown: "&#54A3FF[hChat] &cSlow down! Wait &e{seconds}s &cbefore mentioning everyone again."
+
+# AFK.
+afk-enabled: "&eYou are now AFK."
+afk-enabled-message: "&eYou are now AFK: &f{message}"
+afk-disabled: "&aYou are no longer AFK."
+afk-no-longer: "&e{player} is no longer AFK."
+
+# Replay.
+replay-empty: "&#54A3FF[hChat] &fNo chat in the replay buffer."
+replay-cleared: "&#54A3FF[hChat] &aReplay buffer cleared."
+replay-header: "&#54A3FF[hChat] &fRecent chat:"
+
+# About.
+about-header: "&#54A3FF[hChat] &fabout"
+about-version: "&7Version: &f{version}"
+about-authors: "&7Authors: &fHauchdev"
+about-website: "&7Website: &fhttps://github.com/hauchdev/hChat"
+about-features: "&7Features: &fprivate messages, spy, ignore, broadcast, channels, mentions, filters, placeholders"
+
+# Ignore list.
+ignore-list-header: "&#54A3FF[hChat] &fIgnored players (click to unignore):"
+ignore-list-empty: "&#54A3FF[hChat] &fYou are not ignoring anyone."
+ignore-list-item: "&7- &f{player}"
 
 
 # Placeholders.

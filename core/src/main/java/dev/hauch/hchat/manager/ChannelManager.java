@@ -61,13 +61,14 @@ public final class ChannelManager {
                     (String) data.getOrDefault("speak-permission", null),
                     (String) data.getOrDefault("see-permission", null),
                     ((Number) data.getOrDefault("cooldown-ms", 0L)).longValue(),
-                    (String) data.getOrDefault("alias", null)));
+                    (String) data.getOrDefault("alias", null),
+                    (boolean) data.getOrDefault("per-world", false)));
         }
 
         // always keep a usable default channel
         if (rebuilt.isEmpty()) {
             rebuilt.put("global", new ChatChannel(
-                    "global", null, -1, null, null, null, 0L, null));
+                    "global", null, -1, null, null, null, 0L, null, false));
         }
         defaultId = rebuilt.containsKey("global") ? "global"
                 : rebuilt.keySet().iterator().next();
@@ -143,6 +144,21 @@ public final class ChannelManager {
     public boolean canSee(Player player, ChatChannel channel) {
         if (!channel.hasSeePermission()) return true;
         return player.hasPermission(channel.seePermission());
+    }
+
+    // join-time: pick the first configured channel whose permission the
+    // player holds, unless they already have a persisted choice. This
+    // never overrides a channel the player switched to themselves.
+    public void applyDefaultByPermission(Player player) {
+        if (activeChannels.containsKey(player.getUniqueId())) return;
+        for (Map.Entry<String, String> entry : config.getDefaultChannelByPermission().entrySet()) {
+            if (!player.hasPermission(entry.getKey())) continue;
+            ChatChannel channel = channels.get(entry.getValue().toLowerCase(Locale.ROOT));
+            if (channel != null && canSee(player, channel)) {
+                setActiveChannel(player, channel);
+                return;
+            }
+        }
     }
 
     // player's active channel (or default)

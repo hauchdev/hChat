@@ -1,6 +1,6 @@
 # Do not edit! Used to auto-migrate this file when new options
 # are added in future releases (your settings are always kept).
-config-version: 4
+config-version: 7
 
 lang: en
 debug: false
@@ -112,6 +112,21 @@ mentions:
     enabled: true
     color: "&#54A3FF"
 
+  # Bold highlight on top of the mention color. A real background color
+  # is NOT possible in vanilla chat (Adventure Style has no background),
+  # so the "highlight" is rendered as bold text.
+  highlight: true
+
+  # Mass mentions (@everyone / @here).
+  everyone-permission: hchat.mention.everyone
+  here-permission: hchat.mention.here
+  everyone-cooldown-seconds: 60
+  everyone-sound:
+    enabled: true
+    sound: "entity.wither.spawn"
+    volume: 1.0
+    pitch: 1.0
+
 direct-messages:
 
   sender:
@@ -131,6 +146,12 @@ direct-messages:
   clickable-actions:
     enabled: true
     reply-command: "/msg {sender}"
+
+  # Action bar shown to the sender when a DM is not delivered because
+  # the receiver has DND enabled or ignores them.
+  silenced-action-bar:
+    enabled: true
+    text: "&e{receiver} is muted - the message was not delivered."
 
 spy-format: "&e{sender} &7-> &e{target}&7: &7{message}"
 
@@ -156,6 +177,16 @@ hover-text:
 #
 # A player's active channel is remembered between sessions.
 channels:
+  # Join a channel automatically based on permission (first match wins).
+  # This never overrides a channel the player chose themselves.
+  default-by-permission:
+    - permission: hchat.channel.default.vip
+      channel: vip
+
+  # Show the active channel in the action bar after switching / on join.
+  hint-on-switch: true
+  hint-on-join: true
+
   global:
     # -1 = no limit (whole server). Default channel everyone starts in.
     # Its format comes from chat.default-format / chat.formats
@@ -188,6 +219,14 @@ channels:
     format: "&6[Trade] {player} &8» &f{message}"
     cooldown-ms: 5000
     alias: "#trade"
+
+  world:
+    # World-scoped channel: messages never cross worlds. {world} is
+    # replaced with the sender's world name.
+    format: "&7[{world}] {player} &8» &f{message}"
+    range: -1
+    per-world: true
+    alias: "#world"
 
 broadcast:
   enabled: true
@@ -224,3 +263,90 @@ word-filter:
     - "blacklist1"
     - "blacklist2"
   action: "block"   # block | mask | warn
+
+# ─── Advanced filters ────────────────────────────────────────────
+# Run in order: word-filter, anti-unicode, anti-caps, anti-ad, anti-spam.
+# Common actions: block | mask | warn | lowercase
+filters:
+  anti-caps:
+    enabled: true
+    max-uppercase-percent: 70
+    min-length: 8
+    action: "mask"
+  anti-unicode:
+    enabled: true
+    # Zero-width spaces, direction overrides, BOM, tag characters...
+    block-invisible: true
+    action: "block"
+  anti-ad:
+    enabled: true
+    # An empty list disables the filter (defaults apply only when the key
+    # is missing). "me" is intentionally not a default TLD: "help.me"
+    # would false-positive on normal prose.
+    patterns:
+      - "(?<![a-zA-Z0-9])([a-z0-9-]+\\.)+(com|net|org|gg|io)"
+      - "(discord\\.gg/|discordapp\\.com/invite/)"
+    # low | medium | high (reserved for future tuning)
+    sensitivity: medium
+    # Substring match: a whitelisted address passes even inside longer text.
+    whitelist:
+      - "tu-servidor.com"
+      - "discord.gg/tuinvite"
+    action: "warn"
+  anti-spam:
+    enabled: true
+    # One message per player every N ms, plus flood detection.
+    global-cooldown-ms: 1500
+    flood:
+      max-messages: 5
+      window-seconds: 3
+      similarity-threshold: 0.8
+    action: "block"
+
+# ─── Chat replay ─────────────────────────────────────────────────
+# In-memory ring buffer used by /hchat replay [player].
+replay:
+  capacity: 50
+
+# ─── AFK ──────────────────────────────────────────────────────────
+# Built-in AFK state: /afk command + automatic detection after N
+# minutes of inactivity. Drives the [afk] chat token.
+afk:
+  enabled: true
+  # Seconds of inactivity before a player is marked AFK automatically (0 = off).
+  auto-timeout-seconds: 300
+  # How often the inactivity check runs (seconds).
+  check-interval-seconds: 30
+  # Any activity (movement, chat, commands, interactions) removes the AFK state.
+  unset-on-activity: true
+  # Announce in chat when an AFK player starts talking again.
+  notify-unset: true
+
+# ─── Slowmode ─────────────────────────────────────────────────────
+# Global chat slowmode: one message per player every N seconds.
+slowmode:
+  enabled: true
+  seconds: 3
+  bypass-permission: hchat.slowmode.bypass
+
+# ─── Chat lock ────────────────────────────────────────────────────
+# Blocks the whole chat. Staff holding the bypass can keep talking.
+chat-lock:
+  enabled: true
+  bypass-permission: hchat.chatlock.bypass
+
+# ─── Staff chat (/sc) ─────────────────────────────────────────────
+staff-chat:
+  format: "&c[Staff] {player} &8» &f{message}"
+  log-to-console: true
+
+# ─── Death messages ───────────────────────────────────────────────
+# Replaces the vanilla death message. Empty format = hide them.
+# Note: this replaces ALL death messages, including PvP kills (the
+# killer is not shown in the basic format).
+death-message:
+  enabled: true
+  format: "&c☠ &7{player} &fdied by {cause}"
+  custom:
+    FALL: "&c{player} learned to fly."
+    LAVA: "&c{player} made friends with the magma."

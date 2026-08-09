@@ -1,5 +1,6 @@
 package dev.hauch.hchat.config;
 
+import dev.hauch.hchat.utils.FilterAction;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -12,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -26,7 +28,7 @@ public class PluginConfig {
      * startup (or /hchat reload) the missing keys are merged from the
      * bundled default file, so users never have to delete config.yml.
      */
-    private static final int CONFIG_VERSION = 4;
+    private static final int CONFIG_VERSION = 7;
 
     private final Plugin plugin;
     private FileConfiguration config;
@@ -83,12 +85,30 @@ public class PluginConfig {
         config.set("config-version", CONFIG_VERSION);
         if (!changed) return; // nothing new - keep the file untouched
 
+        backupOldConfig(storedVersion);
         try {
             config.save(new File(plugin.getDataFolder(), "config.yml"));
             plugin.getLogger().info("[hChat] Config migrated to v" + CONFIG_VERSION
                     + " - new options added, your settings were kept.");
         } catch (IOException e) {
             plugin.getLogger().warning("Failed to save migrated config: "
+                    + e.getMessage());
+        }
+    }
+
+    // keep the pre-migration file around, once per source version, so an
+    // admin can diff or roll back after an upgrade
+    private void backupOldConfig(int storedVersion) {
+        File current = new File(plugin.getDataFolder(), "config.yml");
+        File backup = new File(plugin.getDataFolder(),
+                "config-backup-v" + storedVersion + ".yml");
+        if (backup.exists()) return;
+        try {
+            Files.copy(current.toPath(), backup.toPath());
+            plugin.getLogger().info("[hChat] Backed up old config to "
+                    + backup.getName());
+        } catch (IOException e) {
+            plugin.getLogger().warning("Could not back up old config: "
                     + e.getMessage());
         }
     }
@@ -193,6 +213,18 @@ public class PluginConfig {
     public String getMessagesClickableActionsReplyCommand() {
         return config.getString("direct-messages.clickable-actions.reply-command",
                 "/msg {sender}");
+    }
+
+    // action bar shown to the sender when the DM was not delivered
+    // because the receiver has DND or ignores them
+    public boolean isDmSilencedActionBarEnabled() {
+        return config.getBoolean("direct-messages.silenced-action-bar.enabled", true);
+    }
+
+    // get the silenced DM action bar text
+    public String getDmSilencedActionBarText() {
+        return config.getString("direct-messages.silenced-action-bar.text",
+                "&e{receiver} is muted - the message was not delivered.");
     }
 
     // get spy format
@@ -478,6 +510,226 @@ public class PluginConfig {
         return config.getString("placeholders.afk.format", "&c[AFK]&r ");
     }
 
+    // is the built-in AFK feature enabled
+    public boolean isAfkEnabled() {
+        return config.getBoolean("afk.enabled", true);
+    }
+
+    // seconds of inactivity before a player is marked AFK automatically (0 = off)
+    public int getAfkAutoTimeoutSeconds() {
+        return config.getInt("afk.auto-timeout-seconds", 300);
+    }
+
+    // how often the auto-AFK check runs (seconds)
+    public int getAfkCheckIntervalSeconds() {
+        return config.getInt("afk.check-interval-seconds", 30);
+    }
+
+    // leave the AFK state on any activity (movement, chat, command...)
+    public boolean isAfkUnsetOnActivity() {
+        return config.getBoolean("afk.unset-on-activity", true);
+    }
+
+    // announce when an AFK player starts chatting again
+    public boolean isAfkNotifyUnset() {
+        return config.getBoolean("afk.notify-unset", true);
+    }
+
+    // is slowmode enabled
+    public boolean isSlowmodeEnabled() {
+        return config.getBoolean("slowmode.enabled", true);
+    }
+
+    // get slowmode seconds
+    public int getSlowmodeSeconds() {
+        return config.getInt("slowmode.seconds", 3);
+    }
+
+    // get slowmode bypass permission
+    public String getSlowmodeBypassPermission() {
+        return config.getString("slowmode.bypass-permission", "hchat.slowmode.bypass");
+    }
+
+    // is chat lock enabled
+    public boolean isChatLockEnabled() {
+        return config.getBoolean("chat-lock.enabled", true);
+    }
+
+    // get chat lock bypass permission
+    public String getChatLockBypassPermission() {
+        return config.getString("chat-lock.bypass-permission", "hchat.chatlock.bypass");
+    }
+
+    // get staff chat format
+    public String getStaffChatFormat() {
+        return config.getString("staff-chat.format", "&c[Staff] {player} &8» &f{message}");
+    }
+
+    // is staff chat logged to console
+    public boolean isStaffChatLogToConsole() {
+        return config.getBoolean("staff-chat.log-to-console", true);
+    }
+
+    // is death message enabled
+    public boolean isDeathMessageEnabled() {
+        return config.getBoolean("death-message.enabled", true);
+    }
+
+    // get death message format
+    public String getDeathMessageFormat() {
+        return config.getString("death-message.format",
+                "&c☠ &7{player} &fdied by {cause}");
+    }
+
+    // get death message custom
+    public String getDeathMessageCustom(String cause) {
+        return config.getString("death-message.custom." + cause);
+    }
+
+    // get everyone mention permission
+    public String getEveryoneMentionPermission() {
+        return config.getString("mentions.everyone-permission", "hchat.mention.everyone");
+    }
+
+    // get here mention permission
+    public String getHereMentionPermission() {
+        return config.getString("mentions.here-permission", "hchat.mention.here");
+    }
+
+    // get everyone mention cooldown seconds
+    public int getEveryoneMentionCooldownSeconds() {
+        return config.getInt("mentions.everyone-cooldown-seconds", 60);
+    }
+
+    // is everyone mention sound enabled
+    public boolean isEveryoneMentionSoundEnabled() {
+        return config.getBoolean("mentions.everyone-sound.enabled", true);
+    }
+
+    // get everyone mention sound
+    public String getEveryoneMentionSound() {
+        return config.getString("mentions.everyone-sound.sound", "entity.wither.spawn");
+    }
+
+    // get everyone mention sound volume
+    public float getEveryoneMentionSoundVolume() {
+        return (float) config.getDouble("mentions.everyone-sound.volume", 1.0);
+    }
+
+    // get everyone mention sound pitch
+    public float getEveryoneMentionSoundPitch() {
+        return (float) config.getDouble("mentions.everyone-sound.pitch", 1.0);
+    }
+
+    // bold highlight for mentioned names. A real background color is not
+    // possible in vanilla chat (Adventure Style has no background), so the
+    // highlight is rendered as bold text on top of the mention color.
+    public boolean isMentionHighlightEnabled() {
+        return config.getBoolean("mentions.highlight", true);
+    }
+
+    // is anti-caps enabled
+    public boolean isAntiCapsEnabled() {
+        return config.getBoolean("filters.anti-caps.enabled", true);
+    }
+
+    // get anti-caps max percent
+    public int getAntiCapsMaxPercent() {
+        return config.getInt("filters.anti-caps.max-uppercase-percent", 70);
+    }
+
+    // get anti-caps min length
+    public int getAntiCapsMinLength() {
+        return config.getInt("filters.anti-caps.min-length", 8);
+    }
+
+    // get anti-caps action
+    public FilterAction getAntiCapsAction() {
+        return FilterAction.parse(config.getString("filters.anti-caps.action", "mask"),
+                FilterAction.MASK);
+    }
+
+    // is anti-unicode enabled
+    public boolean isAntiUnicodeEnabled() {
+        return config.getBoolean("filters.anti-unicode.enabled", true);
+    }
+
+    // is anti-unicode block invisible enabled
+    public boolean isAntiUnicodeBlockInvisible() {
+        return config.getBoolean("filters.anti-unicode.block-invisible", true);
+    }
+
+    // get anti-unicode action
+    public FilterAction getAntiUnicodeAction() {
+        return FilterAction.parse(config.getString("filters.anti-unicode.action", "block"),
+                FilterAction.BLOCK);
+    }
+
+    // is anti-ad enabled
+    public boolean isAntiAdEnabled() {
+        return config.getBoolean("filters.anti-ad.enabled", true);
+    }
+
+    // get anti-ad patterns. When the key is absent the built-in defaults
+    // apply; an explicit (even empty) list is respected as-is.
+    public List<String> getAntiAdPatterns() {
+        if (!config.contains("filters.anti-ad.patterns")) {
+            // "me" is intentionally omitted: "help.me" / "give.me" would
+            // false-positive on normal prose.
+            return List.of(
+                    "(?<![a-zA-Z0-9])([a-z0-9-]+\\.)+(com|net|org|gg|io)",
+                    "(discord\\.gg/|discordapp\\.com/invite/)");
+        }
+        return config.getStringList("filters.anti-ad.patterns");
+    }
+
+    // get anti-ad whitelist
+    public List<String> getAntiAdWhitelist() {
+        return config.getStringList("filters.anti-ad.whitelist");
+    }
+
+    // get anti-ad action
+    public FilterAction getAntiAdAction() {
+        return FilterAction.parse(config.getString("filters.anti-ad.action", "warn"),
+                FilterAction.WARN);
+    }
+
+    // is anti-spam enabled
+    public boolean isAntiSpamEnabled() {
+        return config.getBoolean("filters.anti-spam.enabled", true);
+    }
+
+    // get anti-spam global cooldown ms
+    public long getAntiSpamGlobalCooldownMs() {
+        return config.getLong("filters.anti-spam.global-cooldown-ms", 1500);
+    }
+
+    // get anti-spam flood max messages
+    public int getAntiSpamFloodMaxMessages() {
+        return config.getInt("filters.anti-spam.flood.max-messages", 5);
+    }
+
+    // get anti-spam flood window ms
+    public long getAntiSpamFloodWindowMs() {
+        return config.getLong("filters.anti-spam.flood.window-seconds", 3) * 1000L;
+    }
+
+    // get anti-spam flood similarity threshold
+    public double getAntiSpamFloodSimilarity() {
+        return config.getDouble("filters.anti-spam.flood.similarity-threshold", 0.8);
+    }
+
+    // get anti-spam action
+    public FilterAction getAntiSpamAction() {
+        return FilterAction.parse(config.getString("filters.anti-spam.action", "block"),
+                FilterAction.BLOCK);
+    }
+
+    // get replay capacity
+    public int getReplayCapacity() {
+        return config.getInt("replay.capacity", 50);
+    }
+
     // is welcome enabled
     public boolean isWelcomeEnabled() {
         return config.getBoolean("welcome.enabled", true);
@@ -560,13 +812,15 @@ public class PluginConfig {
         return config.getBoolean("quit.sound.enabled", false);
     }
 
-    // get channels
+    // get channels. Non-channel keys that live in the same section
+    // (default-by-permission, hint flags) are skipped here.
     public Map<String, Map<String, Object>> getChannels() {
         Map<String, Map<String, Object>> result = new LinkedHashMap<>();
         ConfigurationSection section = config.getConfigurationSection("channels");
         if (section == null) return result;
 
         for (String key : section.getKeys(false)) {
+            if (isChannelOptionKey(key)) continue;
             ConfigurationSection sub = section.getConfigurationSection(key);
             if (sub == null) continue;
 
@@ -578,9 +832,45 @@ public class PluginConfig {
             data.put("see-permission", sub.getString("see-permission"));
             data.put("cooldown-ms", sub.getLong("cooldown-ms", 0));
             data.put("alias", sub.getString("alias"));
+            data.put("per-world", sub.getBoolean("per-world", false));
             result.put(key, data);
         }
         return result;
+    }
+
+    // keys inside the channels section that are options, not channels
+    private static boolean isChannelOptionKey(String key) {
+        return "default-by-permission".equals(key)
+                || "hint-on-switch".equals(key)
+                || "hint-on-join".equals(key);
+    }
+
+    // get default channel per permission: permission -> channel id, in
+    // config order (first match wins at join time)
+    public Map<String, String> getDefaultChannelByPermission() {
+        Map<String, String> result = new LinkedHashMap<>();
+        List<?> list = config.getList("channels.default-by-permission");
+        if (list == null) return result;
+        for (Object item : list) {
+            if (!(item instanceof Map<?, ?> map)) continue;
+            Object permission = map.get("permission");
+            Object channel = map.get("channel");
+            if (permission instanceof String p && !p.isBlank()
+                    && channel instanceof String c && !c.isBlank()) {
+                result.put(p, c);
+            }
+        }
+        return result;
+    }
+
+    // show the active channel in the action bar after /channel
+    public boolean isChannelHintOnSwitch() {
+        return config.getBoolean("channels.hint-on-switch", true);
+    }
+
+    // show the active channel in the action bar on join
+    public boolean isChannelHintOnJoin() {
+        return config.getBoolean("channels.hint-on-join", true);
     }
 
     // is update checker enabled

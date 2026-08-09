@@ -26,8 +26,8 @@ jobs:
           java-version: '21.0.5'
           cache: 'maven'
 
-      - name: Compile all modules and produce shaded jar
-        run: mvn clean package -DskipTests --batch-mode --errors --fail-at-end
+      - name: Compile all modules, run unit tests and produce shaded jar
+        run: mvn clean package --batch-mode --errors --fail-at-end
 
       - name: Upload shaded jar
         uses: actions/upload-artifact@v4

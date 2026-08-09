@@ -2,6 +2,7 @@ package dev.hauch.hchat.command;
 
 import dev.hauch.hchat.config.PluginConfig;
 import dev.hauch.hchat.config.PluginMessages;
+import dev.hauch.hchat.manager.DndManager;
 import dev.hauch.hchat.manager.IgnoreManager;
 import dev.hauch.hchat.manager.MessageHistory;
 import dev.hauch.hchat.manager.OfflineMessageStore;
@@ -45,6 +46,7 @@ public class MessageCommand implements CommandExecutor, TabCompleter {
     private final MessageHistory messageHistory;
     private final ChatLogger chatLogger;
     private final OfflineMessageStore offlineStore;
+    private final DndManager dndManager;
 
     // make MessageCommand
     public MessageCommand(Plugin plugin,
@@ -54,7 +56,8 @@ public class MessageCommand implements CommandExecutor, TabCompleter {
                           SpyManager spyManager,
                           MessageHistory messageHistory,
                           ChatLogger chatLogger,
-                          OfflineMessageStore offlineStore) {
+                          OfflineMessageStore offlineStore,
+                          DndManager dndManager) {
         this.plugin = plugin;
         this.config = config;
         this.messages = messages;
@@ -63,6 +66,7 @@ public class MessageCommand implements CommandExecutor, TabCompleter {
         this.messageHistory = messageHistory;
         this.chatLogger = chatLogger;
         this.offlineStore = offlineStore;
+        this.dndManager = dndManager;
     }
 
     @Override
@@ -102,7 +106,9 @@ public class MessageCommand implements CommandExecutor, TabCompleter {
             String rendered = GsonComponentSerializer.gson()
                     .serialize(MessageFormatter.format(
                             config.getMessageReceiverFormat(), placeholders));
-            offlineStore.save(offline.getUniqueId(), rendered);
+            offlineStore.save(offline.getUniqueId(),
+                    new OfflineMessageStore.OfflineMessage(
+                            player.getName(), System.currentTimeMillis(), rendered));
 
             placeholders.clear();
             placeholders.put("target", offline.getName() != null ? offline.getName() : args[0]);
@@ -118,12 +124,21 @@ public class MessageCommand implements CommandExecutor, TabCompleter {
 
         if (ignoreManager.isIgnored(target, player)) {
             player.sendMessage(MessageFormatter.format(messages.getString("ignored-by-target")));
+            sendSilencedActionBar(player, target);
             return true;
         }
 
         if (ignoreManager.isIgnored(player, target) && !player.hasPermission("hchat.bypass.ignore")) {
             player.sendMessage(MessageFormatter.format(messages.getString("you-are-ignoring-player"))
                     .replaceText(b -> b.matchLiteral("{player}").replacement(target.getName())));
+            sendSilencedActionBar(player, target);
+            return true;
+        }
+
+        if (dndManager.isDnd(target) && !player.hasPermission("hchat.bypass.dnd")) {
+            player.sendMessage(MessageFormatter.format(messages.getString("dnd-blocked"),
+                    Map.of("player", target.getName())));
+            sendSilencedActionBar(player, target);
             return true;
         }
 
@@ -186,6 +201,15 @@ public class MessageCommand implements CommandExecutor, TabCompleter {
         }
 
         return true;
+    }
+
+    // show the "message not delivered" action bar when the receiver has
+    // DND or ignores the sender (configurable, off by default per key)
+    private void sendSilencedActionBar(Player sender, Player target) {
+        if (!config.isDmSilencedActionBarEnabled()) return;
+        sender.sendActionBar(MessageFormatter.format(
+                config.getDmSilencedActionBarText(),
+                Map.of("receiver", target.getName())));
     }
 
     @Override

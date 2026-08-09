@@ -37,6 +37,19 @@ permissions:
       - hchat.monitor.filter
       - hchat.bypass-log
       - hchat.channel
+      - hchat.slowmode
+      - hchat.slowmode.bypass
+      - hchat.chatlock
+      - hchat.chatlock.bypass
+      - hchat.dnd
+      - hchat.sc
+      - hchat.ping
+      - hchat.ping.others
+      - hchat.seen
+      - hchat.mention.everyone
+      - hchat.mention.here
+      - hchat.bypass.dnd
+      - hchat.afk
 
   hchat.message:
     description: Allows /message command
@@ -77,6 +90,45 @@ permissions:
     default: op
   hchat.channel:
     description: Allows /channel command
+    default: true
+  hchat.slowmode:
+    description: Allows /slowmode command
+    default: op
+  hchat.slowmode.bypass:
+    description: Bypass the global chat slowmode
+    default: op
+  hchat.chatlock:
+    description: Allows /chatlock command
+    default: op
+  hchat.chatlock.bypass:
+    description: Keep talking while the chat is locked
+    default: op
+  hchat.dnd:
+    description: Allows /dnd command
+    default: true
+  hchat.sc:
+    description: Allows /sc staff chat
+    default: op
+  hchat.ping:
+    description: Allows /ping command
+    default: true
+  hchat.ping.others:
+    description: Allows checking other players' ping
+    default: op
+  hchat.seen:
+    description: Allows /seen command
+    default: true
+  hchat.mention.everyone:
+    description: Allows using @everyone
+    default: op
+  hchat.mention.here:
+    description: Allows using @here
+    default: op
+  hchat.bypass.dnd:
+    description: Send messages to players with DND enabled
+    default: op
+  hchat.afk:
+    description: Allows /afk command
     default: true
 
 commands:
@@ -125,4 +177,39 @@ commands:
     aliases:
       - ch
     permission: hchat.channel
+    permission-message: You do not have <permission> to use this command!
+  slowmode:
+    description: Set the global chat slowmode.
+    usage: /slowmode <seconds|off|status>
+    permission: hchat.slowmode
+    permission-message: You do not have <permission> to use this command!
+  chatlock:
+    description: Lock or unlock the chat.
+    usage: /chatlock <on|off|status>
+    permission: hchat.chatlock
+    permission-message: You do not have <permission> to use this command!
+  dnd:
+    description: Toggle do-not-disturb mode.
+    usage: /dnd [on|off]
+    permission: hchat.dnd
+    permission-message: You do not have <permission> to use this command!
+  sc:
+    description: Staff chat.
+    usage: /sc <message>
+    permission: hchat.sc
+    permission-message: You do not have <permission> to use this command!
+  ping:
+    description: Show your (or another player's) ping.
+    usage: /ping [player]
+    permission: hchat.ping
+    permission-message: You do not have <permission> to use this command!
+  seen:
+    description: Show when a player was last seen.
+    usage: /seen <player>
+    permission: hchat.seen
+    permission-message: You do not have <permission> to use this command!
+  afk:
+    description: Toggle AFK state (optionally with a message).
+    usage: /afk [message]
+    permission: hchat.afk
     permission-message: You do not have <permission> to use this command!

@@ -1,5 +1,6 @@
 package dev.hauch.hchat.command;
 
+import dev.hauch.hchat.config.PluginConfig;
 import dev.hauch.hchat.config.PluginMessages;
 import dev.hauch.hchat.manager.ChannelManager;
 import dev.hauch.hchat.model.ChatChannel;
@@ -24,12 +25,15 @@ public class ChannelCommand implements CommandExecutor, TabCompleter {
 
     private final PluginMessages messages;
     private final ChannelManager channelManager;
+    private final PluginConfig config;
 
     // make ChannelCommand
     public ChannelCommand(PluginMessages messages,
-                          ChannelManager channelManager) {
+                          ChannelManager channelManager,
+                          PluginConfig config) {
         this.messages = messages;
         this.channelManager = channelManager;
+        this.config = config;
     }
 
     @Override
@@ -67,7 +71,20 @@ public class ChannelCommand implements CommandExecutor, TabCompleter {
         channelManager.setActiveChannel(player, channel);
         player.sendMessage(MessageFormatter.format(messages.getString("channel-switched"),
                 Map.of("channel", channel.id())));
+        if (config.isChannelHintOnSwitch()) {
+            showChannelHint(player, channel);
+        }
         return true;
+    }
+
+    // 3-second action-bar hint with the active channel (uses the
+    // channel's own action-bar-hint when set, otherwise the lang message)
+    private void showChannelHint(Player player, ChatChannel channel) {
+        Component hint = channel.hasActionBarHint()
+                ? MessageFormatter.format(channel.actionBarHint())
+                : MessageFormatter.format(messages.getString("channel-current"),
+                        Map.of("channel", channel.id()));
+        player.sendActionBar(hint);
     }
 
     // list channels
