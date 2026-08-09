@@ -56,7 +56,7 @@
     <properties>
         <!-- Single source of truth for the plugin version. Change this
              one value to release a new version (e.g. 1.3.0). -->
-        <revision>1.2.6</revision>
+        <revision>1.3.0</revision>
 
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>

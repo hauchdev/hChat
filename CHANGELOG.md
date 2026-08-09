@@ -10,6 +10,119 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.3.0] 2026-08-09
+
+### Added
+
+#### 🛡️ Moderation
+- **`/slowmode <seconds|off|status>`** — global per-player chat cooldown
+  kept in memory (never rewrites `config.yml`, comments preserved), with
+  configurable bypass permission (`hchat.slowmode.bypass`).
+- **`/chatlock on|off|status`** — locks the whole chat; staff with
+  `hchat.chatlock.bypass` keep talking.
+- **Staff chat `/sc`** — private staff channel with its own format and
+  optional console logging (`staff-chat.*`).
+- **Mass mentions `@everyone` / `@here`** — permission-gated
+  (`hchat.mention.everyone` / `hchat.mention.here`) with per-token
+  cooldown and sound; `@here` only reaches players in the same world.
+- **Advanced filter chain** (`filters:` section, config v6): anti-caps
+  (block/mask/lowercase), anti-unicode (zero-width spaces, direction
+  overrides, tag characters, BOM), anti-advertisement (regex patterns +
+  whitelist + fast-fail) and anti-spam (global per-player cooldown +
+  sliding-window flood detection with Levenshtein similarity).
+  `WordFilter` now runs inside the same `FilterChain` pipeline.
+
+#### 💬 Chat & channels
+- **Per-world channels** — `channels.<id>.per-world` stops messages from
+  crossing worlds; `{world}` placeholder available in channel formats.
+- **Default channel by permission** — `channels.default-by-permission`
+  joins the first matching channel on entry without overriding a
+  persisted choice.
+- **Channel action-bar hints** — 3-second action bar with the active
+  channel after switching (`channels.hint-on-switch`) and on join
+  (`channels.hint-on-join`).
+- **Chat replay** — `/hchat replay [player]` reprints the last lines of
+  chat (ring buffer, `replay.capacity`, default 50) and
+  `/hchat replay clear-buffer` empties it. Channels with a see-permission
+  are never buffered.
+- **Mention highlight** — bold highlight on top of the mention color
+  (`mentions.highlight`). A real background color is not possible in
+  vanilla chat (Adventure `Style` has no background), so the highlight is
+  bold text.
+- **Click-to-reply on global chat** — the previously unused
+  `hover-text.format` now renders the hover tooltip + `/msg` suggestion
+  on public chat.
+
+#### 🧑‍🤝‍🧑 Social & QoL
+- **`/dnd [on|off]`** — completes the DND feature: DMs to a DND player
+  are blocked with a lang message; `hchat.bypass.dnd` overrides.
+- **`/ping [player]`** and **`/seen <player>`**.
+- **`/afk [message]`** — built-in AFK with automatic inactivity
+  detection (`afk.auto-timeout-seconds`), activity-based unset
+  (movement/chat/commands/interactions), chat announcement when returning
+  (`afk.notify-unset`) and integration with the `[afk]` chat token
+  (built-in state first, PAPI fallback).
+- **`/hchat mail read|clear|send`** — offline messages now keep the
+  sender + timestamp; joining shows a clickable summary
+  (`offline-messages-pending`) instead of auto-delivering, and
+  `/hchat mail read` lists them with a reply suggestion.
+- **Silenced-DM action bar** — when a DM is not delivered (receiver has
+  DND or ignores the sender), the sender sees the configurable
+  `direct-messages.silenced-action-bar`.
+- **`/hchat about`** and **`/hchat ignore list`** (click to unignore).
+- **Death messages** — configurable, per-cause death messages
+  (`death-message.*`), replacing the vanilla line.
+
+#### 🔌 API & developer
+- **Expanded public API** — `HChatProvider` now exposes
+  `channelManager()`, `dndManager()`, `messageHistory()` and
+  `broadcastService()`, plus `publishToChannel(channel, message)`.
+- **Premium extension API** — `dev.hauch.hchat.api.premium`
+  (`PremiumModule`, `PremiumChatEnhancer`) lets a private Premium edition
+  register commands/listeners/managers and hook chat processing
+  (`allowChat` / `transformMessage` / `transformFormat`) without forking
+  the free core. The free distribution never references it and keeps
+  working without it.
+
+#### 🛠️ Build & tests
+- **Config v7** — new sections `slowmode`, `chat-lock`, `staff-chat`,
+  `death-message`, `mentions.everyone-*` + `mentions.highlight`,
+  `filters:*`, `replay`, `afk:*`, `channels.default-by-permission` +
+  `channels.hint-*`, `direct-messages.silenced-action-bar`. Automatic
+  migration merges the new keys into existing configs and now backs up
+  the old file once per source version (`config-backup-v{n}.yml`).
+- **Unit tests** — JUnit 5 suite in `core` (26 tests) covering
+  `OfflineMessageStore`, `ChatReplay`, `FilterAction`, `ChatChannel` and
+  `MessageFormatter`. CI now runs the tests on every build (removed
+  `-DskipTests`).
+- **New commands** — `/slowmode`, `/chatlock`, `/sc`, `/dnd`, `/ping`,
+  `/seen`, `/afk` (plus `hchat.afk` and the other permissions) in
+  `plugin.yml`.
+
+### Fixed
+- **Mention colors now actually render** — the renderer previously
+  ignored `event.message()`, so the mention-color edit was invisible.
+  The message is now built as a `Component` with styled mentions
+  embedded into the rendered format.
+- **`@everyoneX` false positive** — mass-mention tokens use a
+  word-boundary check, so `@everyoneX` is no longer treated as
+  `@everyone`.
+- **Blocked messages no longer consume cooldowns** — the mass-mention
+  gate (and the chatlock/slowmode/channel checks) run before any
+  cooldown is recorded.
+- **`/dnd on|off` state message** — explicit on/off no longer showed the
+  inverted state.
+- **`/slowmode` no longer destroys `config.yml` comments** — the value is
+  kept in memory, not written back to the file.
+
+### Changed
+- **`OfflineMessageStore`** entries carry sender + timestamp and are only
+  removed when read or cleared (`/hchat mail`); joining shows a summary.
+- **`DynamicPlaceholderResolver`** prefers the built-in AFK state for
+  `[afk]`; the PAPI placeholder remains the fallback.
+
+---
+
 ## [1.2.6] 2026-08-08
 
 ### Added
@@ -308,7 +421,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[Unreleased]: https://github.com/hauchdev/hChat/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/hauchdev/hChat/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/hauchdev/hChat/compare/v1.2.6...v1.3.0
 [1.2.0]: https://github.com/hauchdev/hChat/compare/v1.1.2...v1.2.0
 [1.1.2]: https://github.com/hauchdev/hChat/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/hauchdev/hChat/compare/v1.1.0...v1.1.1
