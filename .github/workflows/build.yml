@@ -60,3 +60,14 @@ jobs:
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish to Modrinth
+        # runs only when the MODRINTH_TOKEN repository secret is set
+        if: ${{ secrets.MODRINTH_TOKEN != '' }}
+        env:
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+        run: |
+          chmod +x .modrinth/publish.sh
+          JAR="$(ls ./release-artifacts/hChat-*.jar | head -n 1)"
+          VERSION="${GITHUB_REF_NAME#v}"
+          .modrinth/publish.sh "$VERSION" "$JAR"

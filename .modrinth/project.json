@@ -1,0 +1,17 @@
+{
+  "slug": "hchat",
+  "title": "hChat",
+  "description": "The modern all-in-one chat plugin for Paper",
+  "categories": ["chat", "utility"],
+  "additional_categories": ["management"],
+  "client_side": "unsupported",
+  "server_side": "required",
+  "license": {
+    "id": "MIT",
+    "url": "https://github.com/hauchdev/hChat/blob/main/LICENSE"
+  },
+  "source_url": "https://github.com/hauchdev/hChat",
+  "issues_url": "https://github.com/hauchdev/hChat/issues",
+  "project_id": "P0DczmuD",
+  "body_file": "page.md"
+}
