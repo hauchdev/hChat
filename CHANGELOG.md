@@ -10,6 +10,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.4.1] 2026-09-27
+
+### Fixed
+- **faststats.dev metrics failed to start** — the metrics context was created
+  without any service attached, which the SDK rejects at startup
+  ("Context created without any service attached, was this intentional?").
+  The metrics service is now attached during initialization and anonymous
+  usage statistics are submitted correctly.
+
+---
+
 ## [1.4.0] 2026-09-20
 
 ### Added
@@ -468,7 +479,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[Unreleased]: https://github.com/hauchdev/hChat/compare/v1.4.0...HEAD
+[Unreleased]: https://github.com/hauchdev/hChat/compare/v1.4.1...HEAD
+[1.4.1]: https://github.com/hauchdev/hChat/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/hauchdev/hChat/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/hauchdev/hChat/compare/v1.2.6...v1.3.0
 [1.2.0]: https://github.com/hauchdev/hChat/compare/v1.1.2...v1.2.0

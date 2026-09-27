@@ -1,7 +1,7 @@
 # hChat — Roadmap
 
-> Public development status of **hChat**. Last updated: 2026-09-20 ·
-> Current version: **1.4.0** · MIT core, free on Modrinth.
+> Public development status of **hChat**. Last updated: 2026-09-27 ·
+> Current version: **1.4.1** · MIT core, free on Modrinth.
 
 ---
 
