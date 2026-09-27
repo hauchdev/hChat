@@ -281,6 +281,7 @@ debug: false
 update-checker:
   enabled: true
   notify-admins: true
+  project: "hchat"
 
 chat:
   default-format: "&7%luckperms_prefix% {player} %luckperms_suffix%&8: &f{message}"

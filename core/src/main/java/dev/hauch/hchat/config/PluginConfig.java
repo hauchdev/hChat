@@ -28,7 +28,7 @@ public class PluginConfig {
      * startup (or /hchat reload) the missing keys are merged from the
      * bundled default file, so users never have to delete config.yml.
      */
-    private static final int CONFIG_VERSION = 7;
+    private static final int CONFIG_VERSION = 9;
 
     private final Plugin plugin;
     private FileConfiguration config;
@@ -892,5 +892,10 @@ public class PluginConfig {
     // notify admins on join
     public boolean isUpdateNotifyAdmins() {
         return config.getBoolean("update-checker.notify-admins", true);
+    }
+
+    // modrinth project slug (or full modrinth.com URL) used by the update checker
+    public String getUpdateCheckerProject() {
+        return config.getString("update-checker.project", "hchat");
     }
 }

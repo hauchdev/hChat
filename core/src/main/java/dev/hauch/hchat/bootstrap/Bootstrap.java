@@ -210,7 +210,8 @@ public final class Bootstrap {
         PluginConfig config = new PluginConfig(plugin);
         PluginMessages messages = new PluginMessages(plugin);
 
-        UpdateChecker updateChecker = new UpdateChecker(plugin);
+        UpdateChecker updateChecker = new UpdateChecker(
+                plugin, config.getUpdateCheckerProject());
 
         plugin.saveResource("lang/lang_en.yml", false);
 

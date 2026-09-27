@@ -1,5 +1,7 @@
 package dev.hauch.hchat.update;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import dev.hauch.hchat.config.PluginMessages;
@@ -18,16 +20,18 @@ import java.util.Map;
 import java.util.logging.Level;
 
 /**
- * Checks the latest GitHub release of this plugin against the running
- * version. Runs fully async (never blocks the main thread) and caches
- * the result so listeners can read it later.
+ * Checks the latest Modrinth version of this plugin against the running
+ * version via the public Modrinth API. Runs fully async (never blocks the
+ * main thread) and caches the result so listeners can read it later.
  */
 public final class UpdateChecker {
 
-    private static final String DEFAULT_REPO = "hauchdev/hChat";
+    private static final String API_BASE = "https://api.modrinth.com/v2/project/";
+    private static final String SITE_BASE = "https://modrinth.com/plugin/";
+    private static final String DEFAULT_SLUG = "hchat";
 
     private final Plugin plugin;
-    private final String repo;           // "hauchdev/hChat"
+    private final String slug;           // "hchat"
     private final String currentVersion; // "1.2.3"
 
     private volatile boolean checked;
@@ -36,23 +40,26 @@ public final class UpdateChecker {
     private volatile boolean updateAvailable;
 
     public UpdateChecker(Plugin plugin) {
-        this(plugin, repoFromWebsite(plugin.getDescription().getWebsite()));
+        this(plugin, DEFAULT_SLUG);
     }
 
-    public UpdateChecker(Plugin plugin, String repo) {
+    public UpdateChecker(Plugin plugin, String slug) {
         this.plugin = plugin;
-        this.repo = repo;
+        String configured = slug == null || slug.isBlank() ? DEFAULT_SLUG : slug.trim();
+        // allow pasting a full modrinth.com URL instead of the bare slug
+        if (configured.contains("modrinth.com/")) {
+            String tail = configured.substring(configured.indexOf("modrinth.com/")
+                    + "modrinth.com/".length());
+            int slash = tail.indexOf('/');
+            configured = (slash > 0 ? tail.substring(0, slash) : tail).trim();
+        }
+        this.slug = configured;
         this.currentVersion = plugin.getDescription().getVersion();
     }
 
-    // derive "owner/repo" from the plugin.yml website URL
-    private static String repoFromWebsite(String website) {
-        if (website != null && website.contains("github.com/")) {
-            String repo = website.substring(
-                    website.indexOf("github.com/") + "github.com/".length());
-            if (!repo.isEmpty()) return repo;
-        }
-        return DEFAULT_REPO;
+    // configured modrinth project slug
+    public String projectSlug() {
+        return slug;
     }
 
     // current running version
@@ -65,12 +72,12 @@ public final class UpdateChecker {
         return checked;
     }
 
-    // latest version found on GitHub (null if the check failed)
+    // latest version found on Modrinth (null if the check failed)
     public String latestVersion() {
         return latestVersion;
     }
 
-    // url of the latest release page
+    // url of the Modrinth project page
     public String releaseUrl() {
         return releaseUrl;
     }
@@ -106,9 +113,9 @@ public final class UpdateChecker {
                     .build();
 
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("https://api.github.com/repos/" + repo + "/releases/latest"))
+                    .uri(URI.create(API_BASE + slug + "/version"))
                     .timeout(Duration.ofSeconds(10))
-                    .header("Accept", "application/vnd.github+json")
+                    .header("Accept", "application/json")
                     .header("User-Agent", "hChat/" + currentVersion)
                     .GET()
                     .build();
@@ -116,22 +123,36 @@ public final class UpdateChecker {
             HttpResponse<String> response = client.send(request,
                     HttpResponse.BodyHandlers.ofString());
 
+            if (response.statusCode() == 404) {
+                plugin.getLogger().warning("[UpdateChecker] Modrinth project '"
+                        + slug + "' not found - check update-checker.project in config.yml");
+                return;
+            }
             if (response.statusCode() != 200) {
-                plugin.getLogger().warning("[UpdateChecker] GitHub API returned HTTP "
+                plugin.getLogger().warning("[UpdateChecker] Modrinth API returned HTTP "
                         + response.statusCode());
                 return;
             }
 
-            JsonObject json = JsonParser.parseString(response.body()).getAsJsonObject();
-            String tag = json.has("tag_name")
-                    ? json.get("tag_name").getAsString() : null;
-            String htmlUrl = json.has("html_url")
-                    ? json.get("html_url").getAsString() : null;
+            JsonArray versions = JsonParser.parseString(response.body()).getAsJsonArray();
+            String versionNumber = null;
+            for (JsonElement element : versions) {
+                JsonObject version = element.getAsJsonObject();
+                // the API lists newest first; skip channels (alpha/beta) so
+                // players only get pinged for stable releases
+                if (version.has("version_type")
+                        && !"release".equals(version.get("version_type").getAsString())) {
+                    continue;
+                }
+                versionNumber = version.has("version_number")
+                        ? version.get("version_number").getAsString() : null;
+                break;
+            }
 
-            if (tag == null || htmlUrl == null) return;
+            if (versionNumber == null) return;
 
-            latestVersion = normalize(tag);
-            releaseUrl = htmlUrl;
+            latestVersion = normalize(versionNumber);
+            releaseUrl = SITE_BASE + slug;
             updateAvailable = compare(currentVersion, latestVersion) < 0;
             checked = true;
         } catch (InterruptedException e) {

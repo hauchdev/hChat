@@ -32,11 +32,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   longer inject MiniMessage tags, click or hover events into chat.
 
 #### ⚙️ Configuration
-- **Config v8** — new `chat.format-mode`, per-channel `channels.<id>.format-mode`
-  and `metrics.token` keys; the automatic migration merges them into existing
-  configs (your settings are always kept).
+- **Config v9** — new `chat.format-mode`, per-channel `channels.<id>.format-mode`,
+  `metrics.token` and `update-checker.project` keys; the automatic migration
+  merges them into existing configs (your settings are always kept).
 
 ### Changed
+- **Update checker now uses Modrinth** — the startup and `/hchat update`
+  checks query the Modrinth API instead of GitHub Releases. The project is
+  configurable via the new `update-checker.project` key (a Modrinth slug or
+  a full modrinth.com project URL; default `hchat`). Alpha and beta versions
+  are skipped, so admins are only notified about stable releases.
 - **LuckPerms is now a soft dependency** — moved from `depend` to `softdepend`
   in `plugin.yml`. Detection happens at runtime and every feature degrades
   gracefully; servers using another permissions plugin can now run hChat.

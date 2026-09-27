@@ -15,7 +15,7 @@
   it is no longer a requirement.
 - [x] **faststats.dev** — replaces bStats as the metrics system
   (token in `metrics.token`; empty = disabled).
-- [x] Automatic `config.yml` migration (config-version 7 → 8).
+- [x] Automatic `config.yml` migration (config-version 7 → 9).
 
 ## 🔜 v1.5.0 — "Storage layer" (free)
 
