@@ -1,54 +1,54 @@
 # hChat — Roadmap
 
-> Estado del desarrollo público de **hChat**. Última actualización: 2026-09-20 ·
-> Versión actual: **1.4.0** · Core MIT y gratuito en Modrinth.
+> Public development status of **hChat**. Last updated: 2026-09-20 ·
+> Current version: **1.4.0** · MIT core, free on Modrinth.
 
 ---
 
-## ✅ v1.4.0 — "Adoption release" (gratuita)
+## ✅ v1.4.0 — "Adoption release" (free)
 
-- [x] **Soporte MiniMessage** — `chat.format-mode` global (`legacy` |
-  `minimessage` | `auto`) más override `format-mode` por canal; los códigos
-  clásicos `&` y `&#RRGGBB` siguen traduciéndose en modo MiniMessage y el
-  texto de jugadores se escapa para evitar inyección de tags.
-- [x] **LuckPerms → softdepend** — detección en runtime, degradación elegante;
-  ya no es requisito instalarlo.
-- [x] **faststats.dev** — sustituye a bStats como sistema de métricas
-  (token en `metrics.token`; vacío = desactivado).
-- [x] Migración automática de `config.yml` (config-version 7 → 8).
+- [x] **MiniMessage support** — global `chat.format-mode` (`legacy` |
+  `minimessage` | `auto`) plus a per-channel `format-mode` override; classic
+  `&` codes and `&#RRGGBB` hex are still translated in MiniMessage mode and
+  player-typed text is escaped to prevent tag injection.
+- [x] **LuckPerms → softdepend** — runtime detection, graceful degradation;
+  it is no longer a requirement.
+- [x] **faststats.dev** — replaces bStats as the metrics system
+  (token in `metrics.token`; empty = disabled).
+- [x] Automatic `config.yml` migration (config-version 7 → 8).
 
-## 🔜 v1.5.0 — "Storage layer" (gratuita)
+## 🔜 v1.5.0 — "Storage layer" (free)
 
-- [ ] Capa de almacenamiento con interfaz `StorageProvider`
-- [ ] **SQLite** (embebida, default) y **MySQL/MariaDB** (HikariCP)
-- [ ] Migrador automático YAML → SQL (primera ejecución)
-- [ ] Async everywhere (no bloquear el hilo principal)
-- [ ] `/hchat storage migrate` para admins
+- [ ] Storage layer with a `StorageProvider` interface
+- [ ] **SQLite** (embedded, default) and **MySQL/MariaDB** (HikariCP)
+- [ ] Automatic YAML → SQL migrator (first run)
+- [ ] Async everywhere (never block the main thread)
+- [ ] `/hchat storage migrate` for admins
 
-## 🔮 v1.7.0 — "Discord bridge" (gratuita)
+## 🔮 v1.7.0 — "Discord bridge" (free)
 
-- [ ] Puente bidireccional canal ↔ canal de Discord (vía DiscordSRV)
-- [ ] `/msg` desde Discord hacia el juego (con toggle)
-- [ ] Formatos independientes juego→Discord y Discord→juego
-- [ ] Webhooks propios opcionales (sin DiscordSRV)
+- [ ] Bidirectional channel ↔ Discord channel bridge (via DiscordSRV)
+- [ ] `/msg` from Discord into the game (with toggle)
+- [ ] Separate formats for game→Discord and Discord→game
+- [ ] Optional first-party webhooks (no DiscordSRV required)
 
-## 🌐 v1.6.0+ — Extensiones
+## 🌐 v1.6.0+ — Extensions
 
-- [ ] Módulo companion para **Velocity** (+ BungeeCord si hay demanda)
-- [ ] Chat global cross-server + `/msg` cross-server
-- [ ] Badges equipables con GUI, chat reactions y emojis de resource pack
+- [ ] Companion module for **Velocity** (+ BungeeCord if there is demand)
+- [ ] Cross-server global chat + cross-server `/msg`
+- [ ] Equippable badges with GUI, chat reactions and resource pack emojis
 
 ## 🚀 v2.0.0 — "hChat Pro v2"
 
-- [ ] Dashboard web (editor de formatos en vivo, opcional self-hosted)
-- [ ] API ampliada para desarrolladores terceros
+- [ ] Web dashboard (live format editor, optional self-hosted)
+- [ ] Extended API for third-party developers
 
 ---
 
-## 📌 Notas
+## 📌 Notes
 
-- El núcleo es y seguirá siendo **MIT** y gratuito.
-- Las extensiones de pago viven en un repositorio privado separado
-  (`/premium/`, ignorado por git) y nunca afectan al core.
-- Versiones y fechas son orientativas; el orden puede ajustarse según
-  feedback de la comunidad.
+- The core is and will remain **MIT** and free.
+- Paid extensions live in a separate private repository
+  (`/premium/`, ignored by git) and never affect the core.
+- Versions and dates are tentative; the order may be adjusted based on
+  community feedback.
