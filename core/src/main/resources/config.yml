@@ -1,13 +1,6 @@
 # Do not edit! Used to auto-migrate this file when new options
 # are added in future releases (your settings are always kept).
-config-version: 9
-
-# ─── Metrics (faststats.dev) ────────────────────────────────────────
-# Anonymous usage metrics via faststats.dev (bStats replacement).
-# Create a project at https://faststats.dev and paste its token below.
-# Leave the token empty to disable metrics completely.
-metrics:
-  token: ""
+config-version: 10
 
 lang: en
 debug: false

@@ -32,9 +32,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   longer inject MiniMessage tags, click or hover events into chat.
 
 #### ⚙️ Configuration
-- **Config v9** — new `chat.format-mode`, per-channel `channels.<id>.format-mode`,
-  `metrics.token` and `update-checker.project` keys; the automatic migration
-  merges them into existing configs (your settings are always kept).
+- **Config v10** — new `chat.format-mode`, per-channel `channels.<id>.format-mode`
+  and `update-checker.project` keys; the automatic migration merges them into
+  existing configs and removes the obsolete `metrics` section (your other
+  settings are always kept).
 
 ### Changed
 - **Update checker now uses Modrinth** — the startup and `/hchat update`
@@ -46,9 +47,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   in `plugin.yml`. Detection happens at runtime and every feature degrades
   gracefully; servers using another permissions plugin can now run hChat.
 - **Metrics: bStats → faststats.dev** — anonymous usage metrics are now sent
-  to [faststats.dev](https://faststats.dev). Create a project there and paste
-  its token under `metrics.token`; an empty token (the default) disables
-  metrics completely. The library is shaded and relocated
+  to [faststats.dev](https://faststats.dev). They are always on and need no
+  configuration. The library is shaded and relocated
   (`dev.hauch.hchat.lib.faststats`) to avoid classpath collisions.
 
 ### Removed

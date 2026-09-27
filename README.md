@@ -878,10 +878,9 @@ for the planned bridge.
 ### 📊 Metrics (faststats.dev)
 
 hChat bundles [faststats.dev](https://faststats.dev) for anonymous plugin
-statistics — no extra download needed. Create a project at faststats.dev,
-paste its token under `metrics.token` in `config.yml`, and metrics start
-on the next restart. Leaving the token empty (the default) disables
-metrics completely.
+statistics — no extra download needed and nothing to configure: metrics
+are always on. No player or chat data is ever collected, only anonymous
+plugin usage counters.
 
 ---
 

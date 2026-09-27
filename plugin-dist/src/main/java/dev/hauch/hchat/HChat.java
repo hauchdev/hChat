@@ -1,15 +1,14 @@
 package dev.hauch.hchat;
 
 import dev.faststats.bukkit.BukkitContext;
-import dev.hauch.hchat.api.HChatProvider;
 import dev.hauch.hchat.bootstrap.Bootstrap;
 import org.bukkit.plugin.java.JavaPlugin;
 
 // class HChat
 public final class HChat extends JavaPlugin {
 
-    /** Project token from https://faststats.dev - empty disables metrics. */
-    private static final String FASTSTATS_TOKEN = "";
+    /** Project token from https://faststats.dev - metrics are always on. */
+    private static final String FASTSTATS_TOKEN = "6eb22d8e72f50c81507087a3596bbf6d";
 
     private BukkitContext fastStatsContext;
 
@@ -22,21 +21,8 @@ public final class HChat extends JavaPlugin {
 
     // start faststats.dev metrics
     private void startMetrics() {
-        String token = FASTSTATS_TOKEN;
         try {
-            token = HChatProvider.get().config().getMetricsToken();
-        } catch (Exception ignored) {
-            // config not ready - fall back to the compiled-in token
-        }
-        if (token == null || token.isBlank()) {
-            token = FASTSTATS_TOKEN;
-        }
-        if (token == null || token.isBlank()) {
-            getLogger().info("faststats.dev metrics disabled (no token).");
-            return;
-        }
-        try {
-            fastStatsContext = new BukkitContext.Factory(this, token).create();
+            fastStatsContext = new BukkitContext.Factory(this, FASTSTATS_TOKEN).create();
             fastStatsContext.ready();
             getLogger().info("faststats.dev metrics enabled.");
         } catch (Throwable t) {

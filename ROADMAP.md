@@ -14,8 +14,8 @@
 - [x] **LuckPerms → softdepend** — runtime detection, graceful degradation;
   it is no longer a requirement.
 - [x] **faststats.dev** — replaces bStats as the metrics system
-  (token in `metrics.token`; empty = disabled).
-- [x] Automatic `config.yml` migration (config-version 7 → 9).
+  (always on, zero configuration).
+- [x] Automatic `config.yml` migration (config-version 7 → 10).
 
 ## 🔜 v1.5.0 — "Storage layer" (free)
 

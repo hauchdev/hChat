@@ -28,7 +28,7 @@ public class PluginConfig {
      * startup (or /hchat reload) the missing keys are merged from the
      * bundled default file, so users never have to delete config.yml.
      */
-    private static final int CONFIG_VERSION = 9;
+    private static final int CONFIG_VERSION = 10;
 
     private final Plugin plugin;
     private FileConfiguration config;
@@ -68,6 +68,14 @@ public class PluginConfig {
         if (defaults == null) return;
 
         boolean changed = false;
+
+        // metrics moved out of config.yml: the faststats.dev token is
+        // compiled into the jar, so the old key is removed from user files
+        if (config.contains("metrics")) {
+            config.set("metrics", null);
+            changed = true;
+        }
+
         for (String key : defaults.getKeys(true)) {
             boolean defaultIsSection = defaults.isConfigurationSection(key);
             if (!config.contains(key)) {
@@ -400,11 +408,6 @@ public class PluginConfig {
     public dev.hauch.hchat.utils.FormatMode getChatFormatMode() {
         return dev.hauch.hchat.utils.FormatMode.parse(
                 config.getString("chat.format-mode", "legacy"));
-    }
-
-    // faststats.dev metrics token (empty = disabled)
-    public String getMetricsToken() {
-        return config.getString("metrics.token", "");
     }
 
     // is chat hex colors
