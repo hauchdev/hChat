@@ -45,6 +45,9 @@ jobs:
       contents: write
 
     steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
       - name: Download compiled artifact
         uses: actions/download-artifact@v4
         with:
@@ -62,11 +65,14 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish to Modrinth
-        # runs only when the MODRINTH_TOKEN repository secret is set
-        if: ${{ secrets.MODRINTH_TOKEN != '' }}
+        # skipped with a notice when the MODRINTH_TOKEN secret is not set
         env:
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
         run: |
+          if [ -z "${MODRINTH_TOKEN:-}" ]; then
+            echo "MODRINTH_TOKEN is not set - skipping Modrinth publish"
+            exit 0
+          fi
           chmod +x .modrinth/publish.sh
           JAR="$(ls ./release-artifacts/hChat-*.jar | head -n 1)"
           VERSION="${GITHUB_REF_NAME#v}"
