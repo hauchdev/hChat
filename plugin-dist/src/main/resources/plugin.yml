@@ -10,9 +10,9 @@ website: https://github.com/hauchdev/hChat
 
 depend:
   - PlaceholderAPI
-  - LuckPerms
 
 softdepend:
+  - LuckPerms
   - Vault
   - DiscordSRV
 

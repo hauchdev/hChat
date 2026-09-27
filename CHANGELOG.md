@@ -10,6 +10,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.4.0] 2026-09-20
+
+### Added
+
+#### 🎨 Chat & formatting
+- **MiniMessage support** — new `chat.format-mode` global option with three
+  parsing modes:
+  - `legacy` — classic `&` codes + `&#RRGGBB` hex (default, fully backwards
+    compatible).
+  - `minimessage` — [MiniMessage](https://docs.advntr.dev/minimessage) tags
+    (`<red>`, `<gradient:red:blue>`, `<#RRGGBB>`, hover/click, transitions…);
+    classic `&` codes and `&#RRGGBB` hex are still translated so existing
+    formats keep working.
+  - `auto` — legacy when the string contains `&` codes, MiniMessage otherwise.
+- **Per-channel format-mode override** — every channel under `channels.<id>`
+  can set its own `format-mode` (e.g. a legacy `global` and a MiniMessage
+  `staff` channel can coexist).
+- **Injection-safe player messages** — under MiniMessage modes, player-typed
+  text is escaped before rendering: players keep their `&` colors but can no
+  longer inject MiniMessage tags, click or hover events into chat.
+
+#### ⚙️ Configuration
+- **Config v8** — new `chat.format-mode`, per-channel `channels.<id>.format-mode`
+  and `metrics.token` keys; the automatic migration merges them into existing
+  configs (your settings are always kept).
+
+### Changed
+- **LuckPerms is now a soft dependency** — moved from `depend` to `softdepend`
+  in `plugin.yml`. Detection happens at runtime and every feature degrades
+  gracefully; servers using another permissions plugin can now run hChat.
+- **Metrics: bStats → faststats.dev** — anonymous usage metrics are now sent
+  to [faststats.dev](https://faststats.dev). Create a project there and paste
+  its token under `metrics.token`; an empty token (the default) disables
+  metrics completely. The library is shaded and relocated
+  (`dev.hauch.hchat.lib.faststats`) to avoid classpath collisions.
+
+### Removed
+- **bStats** — the `org.bstats` dependency, `metrics.enabled` toggle wiring in
+  the entry point and the bStats shading/relocation rules are gone.
+
+---
+
 ## [1.3.0] 2026-08-09
 
 ### Added
@@ -421,7 +463,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[Unreleased]: https://github.com/hauchdev/hChat/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/hauchdev/hChat/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/hauchdev/hChat/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/hauchdev/hChat/compare/v1.2.6...v1.3.0
 [1.2.0]: https://github.com/hauchdev/hChat/compare/v1.1.2...v1.2.0
 [1.1.2]: https://github.com/hauchdev/hChat/compare/v1.1.1...v1.1.2

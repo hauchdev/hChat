@@ -80,10 +80,10 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- bStats metrics - bundled and relocated into the final jar. -->
+        <!-- faststats.dev metrics - bundled and relocated into the final jar. -->
         <dependency>
-            <groupId>org.bstats</groupId>
-            <artifactId>bstats-bukkit</artifactId>
+            <groupId>dev.faststats.metrics</groupId>
+            <artifactId>bukkit</artifactId>
         </dependency>
 
     </dependencies>
@@ -146,16 +146,16 @@
                                     <include>dev.hauch:v1_21_R1</include>
                                     <include>dev.hauch:v1_21_R2</include>
                                     <include>dev.hauch:v1_21_R3</include>
-                                    <include>org.bstats:*</include>
+                                    <include>dev.faststats.metrics:*</include>
                                 </includes>
                             </artifactSet>
 
-                            <!-- Keep bStats out of the global org.bstats package so
+                            <!-- Keep FastStats out of the global dev.faststats package so
                                  it cannot collide with other plugins' copies. -->
                             <relocations>
                                 <relocation>
-                                    <pattern>org.bstats</pattern>
-                                    <shadedPattern>${shade.prefix}.bstats</shadedPattern>
+                                    <pattern>dev.faststats</pattern>
+                                    <shadedPattern>${shade.prefix}.faststats</shadedPattern>
                                 </relocation>
                             </relocations>
 

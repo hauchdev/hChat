@@ -110,8 +110,8 @@
   </tr>
   <tr>
     <td align="center" width="33%">
-      <b>🎨 Hex Colors</b><br>
-      <sub><code>&amp;#RRGGBB</code> hex + classic <code>&amp;</code> legacy codes</sub>
+      <b>🎨 MiniMessage + Hex</b><br>
+      <sub>MiniMessage tags, <code>&amp;#RRGGBB</code> hex and classic <code>&amp;</code> codes</sub>
     </td>
     <td align="center" width="33%">
       <b>🖱️ Hover & Click</b><br>
@@ -179,7 +179,8 @@ wget https://github.com/hauchdev/hChat/releases/latest/download/hChat.jar
 # 2. Drop it into your server's plugins folder
 mv hChat.jar /your-server/plugins/
 
-# 3. Make sure PlaceholderAPI and LuckPerms are installed (required)
+# 3. Make sure PlaceholderAPI is installed (required). LuckPerms is
+#    recommended but no longer required
 
 # 4. Restart or reload your server
 ```
@@ -527,8 +528,20 @@ death-message:
 | `%player_name%` | Resolved by PlaceholderAPI for any hook registered on it|
 
 The renderer resolves every entry in two passes: first placeholders are
-substituted, then `MessageFormatter` parses `&`-color codes and hex
-(`&#RRGGBB`) so styling works everywhere.
+substituted, then `MessageFormatter` parses the format. How formats are
+parsed is controlled by `chat.format-mode`:
+
+| Mode          | Behavior                                                                 |
+|---------------|--------------------------------------------------------------------------|
+| `legacy`      | Classic `&` codes + `&#RRGGBB` hex (default, backwards compatible)       |
+| `minimessage` | [MiniMessage](https://docs.advntr.dev/minimessage) tags (`<red>`, `<gradient:red:blue>`, `<#RRGGBB>`, hover/click) — classic `&` codes and `&#RRGGBB` hex are still translated |
+| `auto`        | Legacy when the format contains `&` codes, MiniMessage otherwise         |
+
+Every channel can override the global mode with its own `format-mode`
+key, so a `global` channel in legacy and a `staff` channel in
+MiniMessage can coexist. Player-typed text is always escaped under
+MiniMessage modes: players can use `&` colors but cannot inject tags,
+click or hover events.
 
 #### 🎯 Dynamic chat tokens
 
@@ -561,6 +574,7 @@ permissions and cooldown. Ship config includes `global`, `local`
 | Feature | Where |
 |---------|-------|
 | Channel format, range, cooldown, aliases | `channels.<id>.*` |
+| Per-channel MiniMessage override | `channels.<id>.format-mode` |
 | Speak / see permissions | `speak-permission`, `see-permission` |
 | Distance-based local chat + action-bar hint | `range`, `action-bar-hint` |
 | Per-world channel (never crosses worlds) | `per-world: true` + `{world}` |
@@ -736,7 +750,7 @@ The scheduler is implemented in `AutoBroadcastManager`.
 
 > ℹ️ **Discord bridge:** when DiscordSRV is installed at startup,
 > hChat logs a confirmation and reserves the integration for the
-> upcoming cross-server chat bridge (Phase 5 in `ROADMAP.md`). No
+> upcoming chat bridge (see `ROADMAP.md`). No
 > broadcast or `/msg` is currently relayed to Discord.
 
 ---
@@ -832,7 +846,7 @@ hChat runs inside the backend servers, not on the proxy:
   DiscordSRV bridge.
 - `{world}` and `[coords]` placeholders resolve on the backend the player
   is currently on.
-- The update checker, bStats and the auto-broadcast scheduler run once per
+- The update checker, faststats.dev metrics and the auto-broadcast scheduler run once per
   backend instance — disable auto-broadcast on all but one server if you
   run a network and do not want duplicated announcements.
 
@@ -846,28 +860,27 @@ hChat runs inside the backend servers, not on the proxy:
 |----------------------------------------------------------------------------------------------------------|---------|------------------------------------|
 | [Paper](https://papermc.io)                                                                             | 1.20+   | Server API (Adventure, `AsyncChatEvent`) |
 | [PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/)                               | 2.11+   | Placeholders, Vault/LuckPerms bridge |
-| [LuckPerms](https://luckperms.net)                                                                       | 5.4+    | Permission management              |
 
 ### 🟡 Optional (`softdepend`)
 
 | Plugin                                          | Purpose                                         |
 |-------------------------------------------------|-------------------------------------------------|
+| [LuckPerms](https://luckperms.net)              | Permission management (recommended; no longer required) |
 | [Vault](https://github.com/milkbowl/Vault)      | Economy + chat formatting hook                  |
 | [DiscordSRV](https://github.com/DiscordSRV/DiscordSRV) | Detected at startup; full cross-chat bridge planned for a future release |
 
 If DiscordSRV is present at startup, hChat logs a confirmation so
 admins know the hook is registered. Forwarding of `/msg` and
 `/broadcast` to Discord is **not** implemented yet — see `ROADMAP.md`
-Phase 5 for the planned bridge.
+for the planned bridge.
 
-### 📊 Metrics (bStats)
+### 📊 Metrics (faststats.dev)
 
-hChat bundles [bStats](https://bstats.org) for anonymous plugin
-statistics — no extra download needed. Server owners can disable it with
-`metrics.enabled: false` in `config.yml` or globally in
-`plugins/bStats/config.yml` (the toggle applies on the next server
-start). The plugin id is defined in `HChat.java` (`BSTATS_PLUGIN_ID`);
-register hChat at bstats.org and set it there to start collecting data.
+hChat bundles [faststats.dev](https://faststats.dev) for anonymous plugin
+statistics — no extra download needed. Create a project at faststats.dev,
+paste its token under `metrics.token` in `config.yml`, and metrics start
+on the next restart. Leaving the token empty (the default) disables
+metrics completely.
 
 ---
 

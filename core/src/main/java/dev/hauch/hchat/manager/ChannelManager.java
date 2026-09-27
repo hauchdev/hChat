@@ -3,6 +3,7 @@ package dev.hauch.hchat.manager;
 import dev.hauch.hchat.config.PluginConfig;
 import dev.hauch.hchat.model.ChatChannel;
 import dev.hauch.hchat.storage.PlayerChannelStorage;
+import dev.hauch.hchat.utils.FormatMode;
 import org.bukkit.entity.Player;
 
 import java.util.Collection;
@@ -62,7 +63,8 @@ public final class ChannelManager {
                     (String) data.getOrDefault("see-permission", null),
                     ((Number) data.getOrDefault("cooldown-ms", 0L)).longValue(),
                     (String) data.getOrDefault("alias", null),
-                    (boolean) data.getOrDefault("per-world", false)));
+                    (boolean) data.getOrDefault("per-world", false),
+                    FormatMode.parse((String) data.getOrDefault("format-mode", null))));
         }
 
         // always keep a usable default channel

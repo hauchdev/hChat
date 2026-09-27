@@ -1,14 +1,17 @@
 package dev.hauch.hchat;
 
+import dev.faststats.bukkit.BukkitContext;
 import dev.hauch.hchat.api.HChatProvider;
 import dev.hauch.hchat.bootstrap.Bootstrap;
-import org.bstats.bukkit.Metrics;
 import org.bukkit.plugin.java.JavaPlugin;
 
 // class HChat
 public final class HChat extends JavaPlugin {
 
-    private static final int BSTATS_PLUGIN_ID = 33232;
+    /** Project token from https://faststats.dev - empty disables metrics. */
+    private static final String FASTSTATS_TOKEN = "";
+
+    private BukkitContext fastStatsContext;
 
     @Override
     // on enable
@@ -17,27 +20,43 @@ public final class HChat extends JavaPlugin {
         startMetrics();
     }
 
-    // start bStats metrics
+    // start faststats.dev metrics
     private void startMetrics() {
-        if (BSTATS_PLUGIN_ID <= 0) {
-            getLogger().info("bStats metrics disabled.");
+        String token = FASTSTATS_TOKEN;
+        try {
+            token = HChatProvider.get().config().getMetricsToken();
+        } catch (Exception ignored) {
+            // config not ready - fall back to the compiled-in token
+        }
+        if (token == null || token.isBlank()) {
+            token = FASTSTATS_TOKEN;
+        }
+        if (token == null || token.isBlank()) {
+            getLogger().info("faststats.dev metrics disabled (no token).");
             return;
         }
         try {
-            if (!HChatProvider.get().config().isMetricsEnabled()) {
-                return;
-            }
-            new Metrics(this, BSTATS_PLUGIN_ID);
-            getLogger().info("bStats metrics enabled.");
-        } catch (Exception t) {
-            // a broken bStats must never take the chat plugin down
-            getLogger().warning("bStats metrics failed to start: " + t.getMessage());
+            fastStatsContext = new BukkitContext.Factory(this, token).create();
+            fastStatsContext.ready();
+            getLogger().info("faststats.dev metrics enabled.");
+        } catch (Throwable t) {
+            // broken metrics must never take the chat plugin down
+            getLogger().warning("faststats.dev metrics failed to start: " + t.getMessage());
+            fastStatsContext = null;
         }
     }
 
     @Override
     // on disable
     public void onDisable() {
+        if (fastStatsContext != null) {
+            try {
+                fastStatsContext.shutdown();
+            } catch (Throwable t) {
+                getLogger().warning("faststats.dev shutdown raised: " + t.getMessage());
+            }
+            fastStatsContext = null;
+        }
         Bootstrap.shutdown();
     }
 

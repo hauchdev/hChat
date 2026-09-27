@@ -12,6 +12,7 @@ import dev.hauch.hchat.manager.SlowmodeManager;
 import dev.hauch.hchat.model.ChatChannel;
 import dev.hauch.hchat.service.DynamicPlaceholderResolver;
 import dev.hauch.hchat.utils.FilterAction;
+import dev.hauch.hchat.utils.FormatMode;
 import dev.hauch.hchat.utils.MessageFormatter;
 import dev.hauch.hchat.utils.filter.FilterChain;
 import io.papermc.paper.event.player.AsyncChatEvent;
@@ -147,7 +148,7 @@ public class ChatListener implements Listener {
                 event.setCancelled(true);
                 return;
             }
-            event.message(MessageFormatter.format(result.text()));
+            event.message(MessageFormatter.formatPlayerMessage(result.text()));
             plainMessage = result.text();
             if (result.warned()) {
                 notifyStaff(sender, plainMessage);
@@ -236,14 +237,18 @@ public class ChatListener implements Listener {
         //     bold highlight. Built once and embedded into the format below
         //     (the renderer never re-reads event.message(), so this is the
         //     only place the styling can be applied).
-        Component messageComponent = buildMessageComponent(plainMessage, sender, recipients);
-
         // 13. per-channel format, clickable to switch channel. The default
         //     channel has no format in config.yml, so it falls back to the
         //     permission-based chat.formats resolution (vip/mvp/admin).
         boolean defaultChannel = channelManager.isDefault(channel);
         String format = channel.hasFormat() ? channel.format()
                 : config.resolveChatFormat(sender);
+        FormatMode formatMode = channel.hasFormat()
+                ? channel.effectiveFormatMode()
+                : config.getChatFormatMode();
+
+        Component messageComponent =
+                buildMessageComponent(plainMessage, sender, recipients, formatMode);
 
         // The format only depends on the sender, so build it once instead of
         // once per viewer: PAPI, dynamic tokens ([ping] [item] [coords]
@@ -259,7 +264,7 @@ public class ChatListener implements Listener {
             resolved = enhancer.transformFormat(sender, resolved);
         }
 
-        Component rendered = MessageFormatter.format(resolved);
+        Component rendered = MessageFormatter.format(resolved, formatMode);
 
         // tokens are resolved before {message} is inserted, so tokens typed
         // by players stay literal
@@ -303,15 +308,16 @@ public class ChatListener implements Listener {
     // visible online player get the configured color plus an optional bold
     // highlight; every other segment is PAPI-resolved and legacy-formatted
     private Component buildMessageComponent(String message, Player sender,
-                                            Set<UUID> recipients) {
+                                            Set<UUID> recipients, FormatMode formatMode) {
         boolean colorize = config.isMentionColorsEnabled();
         Matcher matcher = MENTION_PATTERN.matcher(message);
         Component result = Component.empty();
         int lastEnd = 0;
         while (matcher.find()) {
             if (matcher.start() > lastEnd) {
-                result = result.append(MessageFormatter.format(
-                        applyPlaceholders(message.substring(lastEnd, matcher.start()), sender)));
+                result = result.append(MessageFormatter.formatPlayerMessage(
+                        applyPlaceholders(message.substring(lastEnd, matcher.start()), sender),
+                        formatMode));
             }
             String mention = matcher.group();
             String name = matcher.group(1);
@@ -325,14 +331,14 @@ public class ChatListener implements Listener {
                 }
                 result = result.append(styled);
             } else {
-                result = result.append(MessageFormatter.format(
-                        applyPlaceholders(mention, sender)));
+                result = result.append(MessageFormatter.formatPlayerMessage(
+                        applyPlaceholders(mention, sender), formatMode));
             }
             lastEnd = matcher.end();
         }
         if (lastEnd < message.length()) {
-            result = result.append(MessageFormatter.format(
-                    applyPlaceholders(message.substring(lastEnd), sender)));
+            result = result.append(MessageFormatter.formatPlayerMessage(
+                    applyPlaceholders(message.substring(lastEnd), sender), formatMode));
         }
         return result;
     }

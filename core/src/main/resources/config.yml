@@ -1,6 +1,13 @@
 # Do not edit! Used to auto-migrate this file when new options
 # are added in future releases (your settings are always kept).
-config-version: 7
+config-version: 8
+
+# ─── Metrics (faststats.dev) ────────────────────────────────────────
+# Anonymous usage metrics via faststats.dev (bStats replacement).
+# Create a project at https://faststats.dev and paste its token below.
+# Leave the token empty to disable metrics completely.
+metrics:
+  token: ""
 
 lang: en
 debug: false
@@ -12,6 +19,13 @@ update-checker:
   notify-admins: true
 
 chat:
+  # How chat formats are parsed:
+  #   legacy      - classic & codes + &#RRGGBB hex (default, backwards compatible)
+  #   minimessage - Adventure MiniMessage tags (<red>, <gradient:...>, <#RRGGBB>);
+  #                 classic & codes and &#RRGGBB hex are still translated
+  #   auto        - legacy when the format uses & codes, MiniMessage otherwise
+  format-mode: legacy
+
   default-format: "&7%luckperms_prefix% {player} %luckperms_suffix%&8: &f{message}"
 
   hex-colors: true
@@ -196,6 +210,9 @@ channels:
   local:
     # Distance-based local chat: only players within `range` blocks
     # see it. Players just outside the range get the action-bar hint.
+    # Optional per-channel format parsing override (legacy | minimessage | auto);
+    # unset = chat.format-mode.
+    # format-mode: minimessage
     format: "&8[Local] &7{player} &8» &f{message}"
     range: 80
     action-bar-hint: "&eThere are people talking near you"

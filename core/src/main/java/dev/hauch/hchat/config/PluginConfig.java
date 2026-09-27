@@ -401,6 +401,17 @@ public class PluginConfig {
                 "&7{prefix}{player}{suffix}&8: &f{message}");
     }
 
+    // global format parse mode ( legacy | minimessage | auto )
+    public dev.hauch.hchat.utils.FormatMode getChatFormatMode() {
+        return dev.hauch.hchat.utils.FormatMode.parse(
+                config.getString("chat.format-mode", "legacy"));
+    }
+
+    // faststats.dev metrics token (empty = disabled)
+    public String getMetricsToken() {
+        return config.getString("metrics.token", "");
+    }
+
     // is chat hex colors
     public boolean isChatHexColors() {
         return config.getBoolean("chat.hex-colors", true);

@@ -56,7 +56,7 @@
     <properties>
         <!-- Single source of truth for the plugin version. Change this
              one value to release a new version (e.g. 1.3.0). -->
-        <revision>1.3.0</revision>
+        <revision>1.4.0</revision>
 
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
@@ -67,7 +67,7 @@
         <!-- API versions -->
         <paper.version>1.21.8-R0.1-SNAPSHOT</paper.version>
         <placeholderapi.version>2.11.6</placeholderapi.version>
-        <bstats.version>3.2.1</bstats.version>
+        <faststats.version>0.30.1</faststats.version>
 
         <!-- Plugin build values -->
         <plugin.name>hChat</plugin.name>
@@ -169,11 +169,11 @@
                 <scope>provided</scope>
             </dependency>
 
-            <!-- bStats metrics - shaded into the final jar by plugin-dist. -->
+            <!-- faststats.dev metrics - shaded into the final jar by plugin-dist. -->
             <dependency>
-                <groupId>org.bstats</groupId>
-                <artifactId>bstats-bukkit</artifactId>
-                <version>${bstats.version}</version>
+                <groupId>dev.faststats.metrics</groupId>
+                <artifactId>bukkit</artifactId>
+                <version>${faststats.version}</version>
                 <scope>compile</scope>
             </dependency>
 
@@ -188,6 +188,11 @@
         <repository>
             <id>placeholderapi</id>
             <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
+        </repository>
+        <repository>
+            <id>faststats-releases</id>
+            <name>FastStats</name>
+            <url>https://repo.faststats.dev/releases</url>
         </repository>
     </repositories>
 

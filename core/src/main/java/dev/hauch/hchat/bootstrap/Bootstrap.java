@@ -57,6 +57,8 @@ import dev.hauch.hchat.storage.PlayerLangStorage;
 import dev.hauch.hchat.storage.YamlIgnoreStorage;
 import dev.hauch.hchat.update.UpdateChecker;
 import dev.hauch.hchat.utils.ChatLogger;
+import dev.hauch.hchat.utils.FormatMode;
+import dev.hauch.hchat.utils.MessageFormatter;
 import dev.hauch.hchat.utils.WordFilter;
 import dev.hauch.hchat.utils.filter.AntiAdFilter;
 import dev.hauch.hchat.utils.filter.AntiCapsFilter;
@@ -101,6 +103,11 @@ public final class Bootstrap {
 
         PluginContext ctx = assemble(plugin);
         context = ctx;
+
+        // Chat format parse mode (legacy | minimessage | auto), applied
+        // again on reload so config changes take effect without a restart.
+        FormatMode chatMode = ctx.config.getChatFormatMode();
+        MessageFormatter.setMode(chatMode);
 
         // The premium module registers its commands, listeners and
         // managers right after the core is assembled, so they take part in
@@ -153,6 +160,7 @@ public final class Bootstrap {
             return;
         }
         ctx.config.reloadConfig();
+        MessageFormatter.setMode(ctx.config.getChatFormatMode());
         ctx.messages.reload();
         ctx.channelManager.reload();
         ctx.slowmodeManager.reload();
