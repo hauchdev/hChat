@@ -22,7 +22,12 @@ public final class HChat extends JavaPlugin {
     // start faststats.dev metrics
     private void startMetrics() {
         try {
-            fastStatsContext = new BukkitContext.Factory(this, FASTSTATS_TOKEN).create();
+            // the context requires at least one attached service; the metrics
+            // service alone already reports game version, player count,
+            // server type and the plugin version - nothing else needed
+            fastStatsContext = new BukkitContext.Factory(this, FASTSTATS_TOKEN)
+                    .metrics(factory -> factory.create())
+                    .create();
             fastStatsContext.ready();
             getLogger().info("faststats.dev metrics enabled.");
         } catch (Throwable t) {
