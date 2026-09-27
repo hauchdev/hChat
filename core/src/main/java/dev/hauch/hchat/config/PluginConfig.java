@@ -137,11 +137,6 @@ public class PluginConfig {
         return debug;
     }
 
-    // is metrics enabled
-    public boolean isMetricsEnabled() {
-        return config.getBoolean("metrics.enabled", true);
-    }
-
     // is mention sound enabled
     public boolean isMentionSoundEnabled() {
         return config.getBoolean("mentions.sound.enabled", true);
