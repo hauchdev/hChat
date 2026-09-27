@@ -44,9 +44,11 @@ in `version-template.json`.
 
 ## CI (optional)
 
-The GitHub workflow builds `hChat-*.jar` on every tag push and, when the
-`MODRINTH_TOKEN` repository secret exists, automatically publishes the
-version to Modrinth right after creating the GitHub Release. To enable
-it, add the secret (personal access token with the **Create versions**
-scope) to the repository settings; push a `v<version>` tag and both
-releases happen.
+The GitHub workflow builds `hChat-*.jar` on every tag push and creates the
+GitHub Release with the jar. **Modrinth publishing is always manual** so
+each upload can be reviewed first:
+
+1. Download the jar from the freshly created GitHub Release (or build it
+   locally).
+2. `export MODRINTH_TOKEN=...` (PAT with the **Create versions** scope).
+3. `.modrinth/publish.sh <version> hChat-<version>.jar`
