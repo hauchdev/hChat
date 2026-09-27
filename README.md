@@ -273,7 +273,7 @@ also controls every audio / visual cue the plugin emits.
 # config-version is bumped automatically when new options are added;
 # your settings are always kept (old file backed up as
 # config-backup-v{n}.yml).
-config-version: 7
+config-version: 10
 
 lang: en
 debug: false

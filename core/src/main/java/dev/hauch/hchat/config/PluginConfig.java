@@ -835,6 +835,7 @@ public class PluginConfig {
 
             Map<String, Object> data = new HashMap<>();
             data.put("format", sub.getString("format"));
+            data.put("format-mode", sub.getString("format-mode"));
             data.put("range", sub.getInt("range", -1));
             data.put("action-bar-hint", sub.getString("action-bar-hint"));
             data.put("speak-permission", sub.getString("speak-permission"));

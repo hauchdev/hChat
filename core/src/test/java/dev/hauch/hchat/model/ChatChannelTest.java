@@ -1,7 +1,9 @@
 package dev.hauch.hchat.model;
 
+import dev.hauch.hchat.utils.FormatMode;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -43,5 +45,11 @@ class ChatChannelTest {
     void seePermissionPresence() {
         assertFalse(channel(null, -1, null, false, null).hasSeePermission());
         assertTrue(channel(null, -1, null, false, "hchat.staff.see").hasSeePermission());
+    }
+
+    @Test
+    void unsetFormatModeFallsBackToLegacy() {
+        assertEquals(FormatMode.LEGACY,
+                channel(null, -1, null, false, null).effectiveFormatMode());
     }
 }
