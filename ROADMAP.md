@@ -1,54 +1,57 @@
-# hChat — Roadmap
+# 🗺️ hChat Public Roadmap
 
-> Public development status of **hChat**. Last updated: 2026-09-27 ·
-> Current version: **1.4.1** · MIT core, free on Modrinth.
-
----
-
-## ✅ v1.4.0 — "Adoption release" (free)
-
-- [x] **MiniMessage support** — global `chat.format-mode` (`legacy` |
-  `minimessage` | `auto`) plus a per-channel `format-mode` override; classic
-  `&` codes and `&#RRGGBB` hex are still translated in MiniMessage mode and
-  player-typed text is escaped to prevent tag injection.
-- [x] **LuckPerms → softdepend** — runtime detection, graceful degradation;
-  it is no longer a requirement.
-- [x] **faststats.dev** — replaces bStats as the metrics system
-  (always on, zero configuration).
-- [x] Automatic `config.yml` migration (config-version 7 → 10).
-
-## 🔜 v1.5.0 — "Storage layer" (free)
-
-- [ ] Storage layer with a `StorageProvider` interface
-- [ ] **SQLite** (embedded, default) and **MySQL/MariaDB** (HikariCP)
-- [ ] Automatic YAML → SQL migrator (first run)
-- [ ] Async everywhere (never block the main thread)
-- [ ] `/hchat storage migrate` for admins
-
-## 🔮 v1.7.0 — "Discord bridge" (free)
-
-- [ ] Bidirectional channel ↔ Discord channel bridge (via DiscordSRV)
-- [ ] `/msg` from Discord into the game (with toggle)
-- [ ] Separate formats for game→Discord and Discord→game
-- [ ] Optional first-party webhooks (no DiscordSRV required)
-
-## 🌐 v1.6.0+ — Extensions
-
-- [ ] Companion module for **Velocity** (+ BungeeCord if there is demand)
-- [ ] Cross-server global chat + cross-server `/msg`
-- [ ] Equippable badges with GUI, chat reactions and resource pack emojis
-
-## 🚀 v2.0.0 — "hChat Pro v2"
-
-- [ ] Web dashboard (live format editor, optional self-hosted)
-- [ ] Extended API for third-party developers
+Welcome to the official roadmap for **hChat**. Our mission is to provide a premium-grade chat experience for Minecraft servers, 100% free and open-source.
 
 ---
 
-## 📌 Notes
+## ✅ Completed Milestones
 
-- The core is and will remain **MIT** and free.
-- Paid extensions live in a separate private repository
-  (`/premium/`, ignored by git) and never affect the core.
-- Versions and dates are tentative; the order may be adjusted based on
-  community feedback.
+### **v1.4.x — The Modern Foundation**
+*Status: Released*
+- [x] **MiniMessage Support:** Full integration of Adventure's MiniMessage for modern formatting.
+- [x] **Format Overrides:** Per-channel formatting modes (Legacy, MiniMessage, or Auto).
+- [x] **Smart Migration:** Automatic configuration updates and backups.
+- [x] **Performance Metrics:** Implementation of non-intrusive analytics via `faststats.dev`.
+- [x] **Dependency Optimization:** LuckPerms is now an optional `softdepend`.
+
+---
+
+## 🚀 Upcoming Releases
+
+### **v1.5.0 — The Infrastructure Update** 🏗️
+*Focus: Performance & Data Scalability*
+- [ ] **SQL Storage Engine:** Support for MySQL, MariaDB (via HikariCP), and SQLite.
+- [ ] **Async Everything:** Moving all I/O operations away from the main server thread.
+- [ ] **Data Migrator:** Built-in tool to transition from YAML to SQL seamlessly.
+- [ ] **Enhanced Tab-Completion:** Context-aware suggestions for all subcommands and channels.
+
+### **v1.6.0 — The Social Bridge** 🌐
+*Focus: External Integrations*
+- [ ] **Pro Discord Bridge:** Bidirectional synchronization using Webhooks for rich player identities.
+- [ ] **Cross-Server Sync:** Synchronize ignores, DND, and mail across multiple backend servers via SQL.
+- [ ] **Discord DMs:** Bridge private messages between the game and Discord.
+
+### **v1.7.0 — The Cosmetic Phase** 🎨
+*Focus: Player Expression*
+- [ ] **Equippable Badges:** GUI-based badge selection system (`/badges`).
+- [ ] **Custom Emojis:** Native support for resource pack glifos and legacy shortcodes (e.g., `:heart:`).
+- [ ] **Chat Reactions:** Interactive games and rewards to boost player engagement.
+
+---
+
+## 🔮 Future Vision (v2.0.0+)
+
+- **Proxy-Native Support:** Dedicated companion modules for **Velocity** and **BungeeCord**.
+- **Global Network Chat:** True cross-proxy communication for large networks.
+- **Developer Ecosystem:** Expanded API and documentation for third-party extensions.
+- **Web Dashboard:** An optional self-hosted interface for real-time format editing and moderation.
+
+---
+
+## 💡 Our Philosophy
+
+1. **Free Forever:** The core features of hChat will always be MIT-licensed and free.
+2. **Quality First:** We build every feature to compete with the best paid alternatives.
+3. **Open for Feedback:** We shape our roadmap based on community needs. [Open a Discussion!](https://github.com/hauchdev/hChat/discussions)
+
+> *Dates and versions are tentative and subject to change based on community feedback and development progress.*
